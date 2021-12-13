@@ -110,18 +110,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
                 switch (menuItem.getItemId()) {
-                    case R.id.dashboard:
-                        startActivity(new Intent(getApplicationContext(), Dashboard.class));
+                    case R.id.profile:
+                        startActivity(new Intent(getApplicationContext(), ProfileActivity.class));
                         overridePendingTransition(0, 0);
                         return true;
 
-                    case R.id.home:
-                        startActivity(new Intent(getApplicationContext(), MainActivity.class));
-                        overridePendingTransition(0, 0);
-                        return true;
-
-                    case R.id.about:
-                        startActivity(new Intent(getApplicationContext(), about.class));
+                    case R.id.messages:
+                        startActivity(new Intent(getApplicationContext(), MessagesActivity.class));
                         overridePendingTransition(0, 0);
                         return true;
                     case R.id.map:

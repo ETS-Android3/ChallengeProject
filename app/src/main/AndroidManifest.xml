@@ -55,7 +55,8 @@
         -->
         <activity
             android:name=".MessagesActivity"
-            android:exported="false" />
+            android:exported="false"
+            />
 
     </application>
 

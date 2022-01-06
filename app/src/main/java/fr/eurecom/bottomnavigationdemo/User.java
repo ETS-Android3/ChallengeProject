@@ -31,6 +31,8 @@ public class User {
         setGender(gender);
         setPhone(phone);
         //setLocation);
+
+
     }
 
     public String getUID() {

@@ -23,6 +23,7 @@ public final class User {
 
     private User (){
         this.UID = auth.getUid();
+        this.location = fetchLocation();
     }
 
     private User(String UID, String name, String age, String gender, String phone) {
@@ -92,6 +93,10 @@ public final class User {
         this.location = location;
     }
 
+    public Location fetchLocation(){
+
+        return null;
+    }
 
 
 

@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "450264615730",
+    "project_id": "challengeproject-334921",
+    "storage_bucket": "challengeproject-334921.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:450264615730:android:9f4c6ba3823ff3a5f2652b",
+        "android_client_info": {
+          "package_name": "fr.eurecom.bottomnavigationdemo"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "450264615730-rvmjfr88bg7klg8if2eus5j4s11ln1ns.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDj5_ZxeZVzR_kNJNl0qnBxqYhT3AyoBw4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "450264615730-rvmjfr88bg7klg8if2eus5j4s11ln1ns.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

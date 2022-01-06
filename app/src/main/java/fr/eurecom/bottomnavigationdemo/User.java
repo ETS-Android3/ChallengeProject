@@ -3,8 +3,12 @@ package fr.eurecom.bottomnavigationdemo;
 import android.location.Location;
 import android.location.LocationManager;
 
+import com.google.firebase.auth.FirebaseAuth;
 
-public class User {
+
+public final class User {
+
+    private static User INSTANCE;
 
     private String UID;
     private String name;
@@ -15,16 +19,29 @@ public class User {
     private Location location;
     private LocationManager locationManager;
 
+    final FirebaseAuth auth = FirebaseAuth.getInstance();
 
-    public User(String UID, String name, String age, String gender, String phone) {
-        setUID(UID);
+    private User (){
+        this.UID = auth.getUid();
+    }
+
+    private User(String UID, String name, String age, String gender, String phone) {
         setName(name);
         setAge(age);
         setGender(gender);
         setPhone(phone);
         //setLocation);
+        this.UID = auth.getUid();
 
+    }
 
+    public static User getInstance(){
+        if (INSTANCE == null){
+            return new User();
+        }
+        else {
+            return INSTANCE;
+        }
     }
 
     public String getUID() {

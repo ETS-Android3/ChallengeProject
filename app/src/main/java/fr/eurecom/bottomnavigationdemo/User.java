@@ -1,16 +1,8 @@
 package fr.eurecom.bottomnavigationdemo;
 
-import android.Manifest;
-import android.content.Context;
-import android.content.pm.PackageManager;
-import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
-import android.util.Log;
-import android.widget.TextView;
 
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 
 public class User {
 

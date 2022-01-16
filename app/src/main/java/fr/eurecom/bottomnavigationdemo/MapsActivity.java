@@ -5,14 +5,27 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SyncStatusObserver;
 import android.content.pm.PackageManager;
+import android.location.Criteria;
 import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.firebase.geofire.GeoFire;
+import com.firebase.geofire.GeoLocation;
+import com.firebase.geofire.GeoQuery;
+import com.firebase.geofire.GeoQueryEventListener;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -21,6 +34,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.places.api.Places;
@@ -28,17 +42,55 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.firebase.ui.auth.AuthUI;
+import com.google.firebase.database.ValueEventListener;
 
 
+import java.security.Provider;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
 import fr.eurecom.bottomnavigationdemo.databinding.ActivityMapsBinding;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
+
+
+    GeoFire geoFire;
+    GeoQuery geoQuery;
+
+    //GeoQuery geoQuery = geoFire.queryAtLocation(new GeoLocation(location.getLatitude(), location.getLongitude()), 1.0);
+
+
+
+    protected LocationManager locationManager = null;
+    private String provider;
+    Location location;
+    public static final int MY_PERMISSIONS_LOCATION = 0;
+
+    HashMap<String, GeoLocation> usersArray = new HashMap<>();
+
+    private final LocationListener mLocationListener = new LocationListener() {
+        @Override
+        public void onLocationChanged(final Location locationChanged) {
+
+            location = getLocation();
+            geoFire.setLocation(user.getUID(), new GeoLocation(location.getLatitude(), location.getLongitude()));
+            user.setLocation(location);
+            geoQuery = geoFire.queryAtLocation(new GeoLocation(location.getLatitude(), location.getLongitude()), 1.0);
+            usersArray.clear();
+            map.clear();
+            createGeoQuery();
+            updateLocationUI();
+
+        }
+    };
 
     private ActivityMapsBinding binding;
     private GoogleMap map;
@@ -61,6 +113,54 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private final User user = User.getInstance();
 
+
+
+
+    private Location getLocation() {
+        Criteria criteria = new Criteria();
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        provider = locationManager.getBestProvider(criteria, false);
+        if (ContextCompat.checkSelfPermission(this.getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(this.getApplicationContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            Log.i("Permission: ", "To be checked");
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, MY_PERMISSIONS_LOCATION);
+
+        } else
+            Log.i("Permission: ", "GRANTED");
+        location = locationManager.getLastKnownLocation(provider);
+        if (locationManager == null)
+            locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        provider = locationManager.getBestProvider(criteria, false);
+        location = locationManager.getLastKnownLocation(provider);
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this.mLocationListener);
+
+        return location;
+    }
+
+
+
+
+
+
+
+
+    //@Override
+    public void onLocationChanged(Location location) {
+        Log.i("Location","LOCATION CHANGED!!!"); //updateLocationView();
+    }
+    //@Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+
+    }
+    // @Override
+    public void onProviderEnabled(String provider) {
+        Toast.makeText(this, "Enabled new provider " + provider, Toast.LENGTH_SHORT).show();
+    }
+    //@Override
+    public void onProviderDisabled(String provider) {
+        Toast.makeText(this, "Disabled provider " + provider, Toast.LENGTH_SHORT).show();
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -69,6 +169,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         // FirebaseDatabase database = FirebaseDatabase.getInstance();
         // DatabaseReference myRef = database.getReference("message");
         // myRef.setValue("Hello, world!");
+
+
+        //checking if user credentials are set
+        //if they are not set, start activity to set credentials
+        //TODO
 
         binding = ActivityMapsBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
@@ -106,7 +211,108 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 return false;
             }
         });
+
+
+
+
+
+        //display other users
+        //final FirebaseDatabase database = FirebaseDatabase.getInstance();
+        //final DatabaseReference myRef = database.getReference("Users");
+
+
+
+        //final myContactAdapter adapter = new myContactAdapter(this, contactsArray);
+
+        location = getLocation();
+
+
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Users");
+        geoFire = new GeoFire(ref);
+
+        geoFire.setLocation("UserDemoStj", new GeoLocation(63.4684, 10.9172));
+        geoFire.setLocation("UserDemoFarAwayTrd", new GeoLocation(63.4250, 10.4428));
+
+        createGeoQuery();
+
+
+
+
+        Log.i("onCreate", "at end");
+
+
     }
+
+
+    private void createGeoQuery() {
+
+
+
+        geoQuery = geoFire.queryAtLocation(new GeoLocation(location.getLatitude(), location.getLongitude()), 1.0);
+
+        //GeoQuery geoQuery = geoFire.queryAtLocation(new GeoLocation(location.getLatitude(), location.getLongitude()), 1.0);
+
+
+
+        final GeoQueryEventListener geoQueryEventListener = new GeoQueryEventListener() {
+
+            @Override
+            public void onKeyEntered(String key, GeoLocation geoLocation) {
+                //System.out.println(String.format("Key %s entered the search area at [%f,%f]", key, geoLocation.latitude, geoLocation.longitude));
+                usersArray.put(key, geoLocation);
+                for(String useKey : usersArray.keySet()) {
+                    Log.i("UserKey: ", useKey+ "location: " +usersArray.get(useKey).toString());
+                }
+                updateLocationUI();
+            }
+
+            @Override
+            public void onKeyExited(String key) {
+                //System.out.println(String.format("Key %s is no longer in the search area", key));
+                usersArray.remove(key);
+                for(String useKey : usersArray.keySet()) {
+                    Log.i("UserKey: ", useKey+ "location: " +usersArray.get(useKey).toString());
+                }
+                updateLocationUI();
+            }
+
+            @Override
+            public void onKeyMoved(String key, GeoLocation geoLocation) {
+                //System.out.println(String.format("Key %s moved within the search area to [%f,%f]", key, geoLocation.latitude, geoLocation.longitude));
+                usersArray.remove(key);
+                usersArray.put(key, geoLocation);
+
+                for(String useKey : usersArray.keySet()) {
+                    Log.i("UserKey: ", useKey+ "location: " +usersArray.get(useKey).toString());
+                }
+                updateLocationUI();
+            }
+
+            @Override
+            public void onGeoQueryReady() {
+                Log.i("onGeoQueryReady", "ready");
+            }
+
+            @Override
+            public void onGeoQueryError(DatabaseError error) {
+                Log.i("onGeoQueryError", error.toString());
+
+            }
+
+        };
+
+        geoQuery.addGeoQueryEventListener(geoQueryEventListener);
+    }
+
+
+
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        //locationManager.removeUpdates(this.mLocationListener);
+    }
+
 
     /**
      * Saves the state of the map when the activity is paused.
@@ -152,6 +358,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         });
 
+
+
         // Prompt the user for permission.
         getLocationPermission();
 
@@ -160,6 +368,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         // Get the current location of the device and set the position of the map.
         getDeviceLocation();
+
+        //createGeoQuery(geoFire, location);
     }
 
     /**
@@ -179,7 +389,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         if (task.isSuccessful()) {
                             // Set the map's camera position to the current location of the device.
                             lastKnownLocation = task.getResult();
+
                             if (lastKnownLocation != null) {
+                                Log.i("TAG", "lastKnownLocation not null: "+lastKnownLocation);
                                 map.moveCamera(CameraUpdateFactory.newLatLngZoom(
                                         new LatLng(lastKnownLocation.getLatitude(),
                                                 lastKnownLocation.getLongitude()), DEFAULT_ZOOM));
@@ -194,9 +406,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     }
                 });
             }
+            //System.out.println("lastknownLoCATION: "+lastKnownLocation);
         } catch (SecurityException e)  {
             Log.e("Exception: %s", e.getMessage(), e);
         }
+
+        //System.out.println("lastKnownLocation: "+lastKnownLocation);
     }
 
     /**
@@ -245,9 +460,20 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             return;
         }
         try {
+            for(String keys : usersArray.keySet()) {
+                if(user.getUID() != keys) {
+                    GeoLocation usLoc = usersArray.get(keys);
+                    double lng = usLoc.longitude;
+                    double lat = usLoc.latitude;
+                    LatLng latLng = new LatLng(lat, lng);
+                    map.addMarker(new MarkerOptions().position(latLng).title(keys));
+                }
+            }
             if (locationPermissionGranted) {
                 map.setMyLocationEnabled(true);
                 map.getUiSettings().setMyLocationButtonEnabled(true);
+
+
             } else {
                 map.setMyLocationEnabled(false);
                 map.getUiSettings().setMyLocationButtonEnabled(false);
@@ -258,5 +484,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             Log.e("Exception: %s", e.getMessage());
         }
     }
+
+
 }
 

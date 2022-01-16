@@ -2,8 +2,19 @@ package fr.eurecom.bottomnavigationdemo;
 
 import android.location.Location;
 import android.location.LocationManager;
+import android.util.Log;
 
+import androidx.annotation.NonNull;
+
+import com.firebase.geofire.GeoFire;
+import com.firebase.geofire.GeoLocation;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
+import java.util.ArrayList;
 
 
 public final class User {
@@ -19,11 +30,16 @@ public final class User {
     private Location location;
     private LocationManager locationManager;
 
+    DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Users");
+    GeoFire geoFire = new GeoFire(ref);
+
+
     final FirebaseAuth auth = FirebaseAuth.getInstance();
 
     private User (){
         this.UID = auth.getUid();
         this.location = fetchLocation();
+        setLocation(location);
     }
 
     private User(String UID, String name, String age, String gender, String phone) {
@@ -90,13 +106,20 @@ public final class User {
     }
 
     public void setLocation(Location location) {
-        this.location = location;
+        Log.i("User", "setLocation()");
+        geoFire.setLocation(UID, new GeoLocation(location.getLatitude(), location.getLongitude()));
+        geoFire.setLocation(UID, new GeoLocation(location.getLatitude(), location.getLongitude()));
+
     }
 
     public Location fetchLocation(){
-
-        return null;
+        Location location = new Location("");
+        location.setLatitude(12.0);
+        location.setLongitude(12.0);
+        return location;
+        //return null;
     }
+
 
 
 

@@ -10,6 +10,8 @@ import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -35,9 +37,11 @@ public final class User {
 
 
     final FirebaseAuth auth = FirebaseAuth.getInstance();
+    final FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
 
     private User (){
         this.UID = auth.getUid();
+        this.name = auth.getCurrentUser().getDisplayName();
         this.location = fetchLocation();
         setLocation(location);
     }
@@ -75,6 +79,11 @@ public final class User {
 
     public void setName(String name) {
         this.name = name;
+        // Updates the "DisplayName" in Firebase Auth
+        firebaseUser.updateProfile(new UserProfileChangeRequest.Builder()
+                .setDisplayName(name)
+                .build()
+        );
     }
 
     public String getAge() {
@@ -117,7 +126,6 @@ public final class User {
         location.setLatitude(12.0);
         location.setLongitude(12.0);
         return location;
-        //return null;
     }
 
 

@@ -61,13 +61,10 @@ import fr.eurecom.bottomnavigationdemo.databinding.ActivityMapsBinding;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
-
     GeoFire geoFire;
     GeoQuery geoQuery;
 
     //GeoQuery geoQuery = geoFire.queryAtLocation(new GeoLocation(location.getLatitude(), location.getLongitude()), 1.0);
-
-
 
     protected LocationManager locationManager = null;
     private String provider;

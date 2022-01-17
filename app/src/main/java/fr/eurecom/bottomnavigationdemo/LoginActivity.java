@@ -73,7 +73,7 @@ public class LoginActivity extends AppCompatActivity {
                     Intent i = new Intent(LoginActivity.this, MapsActivity.class);
                     startActivity(i);
                     // we are calling finish method to kill or
-                    // mainactivity which is displaying our login ui.
+                    // main activity which is displaying our login ui.
                     finish();
 
                     // Stay on this activity?

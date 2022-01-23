@@ -134,13 +134,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         return location;
     }
 
-
-
-
-
-
-
-
     //@Override
     public void onLocationChanged(Location location) {
         Log.i("Location","LOCATION CHANGED!!!"); //updateLocationView();
@@ -161,13 +154,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        // Testing firebase connection
-        // FirebaseDatabase database = FirebaseDatabase.getInstance();
-        // DatabaseReference myRef = database.getReference("message");
-        // myRef.setValue("Hello, world!");
-
-
         //checking if user credentials are set
         //if they are not set, start activity to set credentials
         //TODO
@@ -185,7 +171,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         // Construct a FusedLocationProviderClient.
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
-
 
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
         bottomNavigationView.setSelectedItemId(R.id.map);
@@ -209,46 +194,23 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         });
 
-
-
-
-
-        //display other users
-        //final FirebaseDatabase database = FirebaseDatabase.getInstance();
-        //final DatabaseReference myRef = database.getReference("Users");
-
-
-
-        //final myContactAdapter adapter = new myContactAdapter(this, contactsArray);
-
         location = getLocation();
 
-
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Users");
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Locations");
         geoFire = new GeoFire(ref);
 
-        geoFire.setLocation("UserDemoStj", new GeoLocation(63.4684, 10.9172));
-        geoFire.setLocation("UserDemoFarAwayTrd", new GeoLocation(63.4250, 10.4428));
+        //geoFire.setLocation("UserDemoStj", new GeoLocation(63.4684, 10.9172));
+        //geoFire.setLocation("UserDemoFarAwayTrd", new GeoLocation(63.4250, 10.4428));
 
         createGeoQuery();
 
-
-
-
         Log.i("onCreate", "at end");
-
 
     }
 
-
     private void createGeoQuery() {
 
-
-
         geoQuery = geoFire.queryAtLocation(new GeoLocation(location.getLatitude(), location.getLongitude()), 1.0);
-
-        //GeoQuery geoQuery = geoFire.queryAtLocation(new GeoLocation(location.getLatitude(), location.getLongitude()), 1.0);
-
 
 
         final GeoQueryEventListener geoQueryEventListener = new GeoQueryEventListener() {
@@ -258,7 +220,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 //System.out.println(String.format("Key %s entered the search area at [%f,%f]", key, geoLocation.latitude, geoLocation.longitude));
                 usersArray.put(key, geoLocation);
                 for(String useKey : usersArray.keySet()) {
-                    Log.i("UserKey: ", useKey+ "location: " +usersArray.get(useKey).toString());
+                    Log.i("UserKey: ", useKey+ " location: " +usersArray.get(useKey).toString());
                 }
                 updateLocationUI();
             }
@@ -268,7 +230,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 //System.out.println(String.format("Key %s is no longer in the search area", key));
                 usersArray.remove(key);
                 for(String useKey : usersArray.keySet()) {
-                    Log.i("UserKey: ", useKey+ "location: " +usersArray.get(useKey).toString());
+                    Log.i("UserKey: ", useKey+ " location: " +usersArray.get(useKey).toString());
                 }
                 updateLocationUI();
             }
@@ -458,7 +420,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
         try {
             for(String keys : usersArray.keySet()) {
-                if(user.getUID() != keys) {
+                if(!user.getUID().equals(keys)) {
                     GeoLocation usLoc = usersArray.get(keys);
                     double lng = usLoc.longitude;
                     double lat = usLoc.latitude;

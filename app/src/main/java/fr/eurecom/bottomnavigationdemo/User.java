@@ -9,6 +9,8 @@ import androidx.annotation.NonNull;
 import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
@@ -23,44 +25,72 @@ public final class User {
 
     private static User INSTANCE;
 
+    public static void logOut() {
+        INSTANCE = null;
+    }
+
+    // Currently fetched from Firebase Auth
     private String UID;
     private String name;
-    private String age;
+    private String email;
+
+    // To be implemented now
+    private int age;
     private String gender;
     private String phone;
 
     private Location location;
     private LocationManager locationManager;
 
-    DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Users");
-    GeoFire geoFire = new GeoFire(ref);
-
+    DatabaseReference ref;
+    DatabaseReference georef;
+    GeoFire geoFire;
 
     final FirebaseAuth auth = FirebaseAuth.getInstance();
     final FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
 
-    private User (){
+    private User() {
+
         this.UID = auth.getUid();
         this.name = auth.getCurrentUser().getDisplayName();
+        this.email = auth.getCurrentUser().getEmail();
         this.location = fetchLocation();
+
+        ref = FirebaseDatabase.getInstance().getReference("Users").child(UID);
+        georef = FirebaseDatabase.getInstance().getReference("Locations");
+        geoFire = new GeoFire(georef);
+
+        ref.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DataSnapshot> task) {
+                if (!task.isSuccessful()) {
+                    Log.e("firebase", "Error getting data", task.getException());
+                } else {
+                    Log.d("firebase", String.valueOf(task.getResult().getValue()));
+                    updateUserData(task);
+                }
+            }
+        });
+        Task<DataSnapshot> dataSnapshot = ref.get();
+
         setLocation(location);
     }
 
-    private User(String UID, String name, String age, String gender, String phone) {
+    private User(String UID, String name, int age, String gender, String phone) {
         setName(name);
         setAge(age);
         setGender(gender);
         setPhone(phone);
         //setLocation);
         this.UID = auth.getUid();
-
     }
 
-    public static User getInstance(){
-        if (INSTANCE == null){
-            return new User();
-        }
-        else {
+    public static User getInstance() {
+        if (INSTANCE == null) {
+            INSTANCE = new User();
+            return INSTANCE;
+
+        } else {
             return INSTANCE;
         }
     }
@@ -77,6 +107,14 @@ public final class User {
         return name;
     }
 
+    public String getEmail() {
+        return this.email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
     public void setName(String name) {
         this.name = name;
         // Updates the "DisplayName" in Firebase Auth
@@ -84,44 +122,55 @@ public final class User {
                 .setDisplayName(name)
                 .build()
         );
+        ref.child("name").setValue(this.getName());
+
     }
 
-    public String getAge() {
+    public int getAge() {
         return age;
     }
 
-    public void setAge(String age) {
+    public void setAge(int age) {
         this.age = age;
+        ref.child("age").setValue(this.getAge());
     }
 
     public String getGender() {
+        if (this.gender == null) {
+            return "null";
+        }
         return gender;
     }
 
     public void setGender(String gender) {
         this.gender = gender;
+        ref.child("gender").setValue(this.getGender());
     }
 
     public String getPhone() {
+        if (this.phone == null) {
+            return "null";
+        }
         return phone;
     }
 
     public void setPhone(String phone) {
         this.phone = phone;
+        ref.child("phone").setValue(this.getPhone());
     }
 
     public Location getLocation() {
         return this.location;
     }
 
+
     public void setLocation(Location location) {
         Log.i("User", "setLocation()");
-        geoFire.setLocation(UID, new GeoLocation(location.getLatitude(), location.getLongitude()));
-        geoFire.setLocation(UID, new GeoLocation(location.getLatitude(), location.getLongitude()));
-
+        geoFire.setLocation(this.getUID(), new GeoLocation(location.getLatitude(), location.getLongitude()));
+        // UPDATES
     }
 
-    public Location fetchLocation(){
+    public Location fetchLocation() {
         Location location = new Location("");
         location.setLatitude(12.0);
         location.setLongitude(12.0);
@@ -130,6 +179,14 @@ public final class User {
 
 
 
-
+    private void updateUserData(Task<DataSnapshot> task) {
+        if (task.getResult().child("age").getValue() != null ||
+                task.getResult().child("phone").getValue() != null ||
+                task.getResult().child("phone").getValue() != null) {
+            this.setAge(((Long) task.getResult().child("age").getValue()).intValue());
+            this.setGender((String) task.getResult().child("gender").getValue());
+            this.setPhone((String) task.getResult().child("phone").getValue());
+        }
+    }
 
 }

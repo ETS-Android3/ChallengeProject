@@ -31,7 +31,7 @@ public class MessagesActivity extends AppCompatActivity {
         logoutBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                User.logOut();
                 // below line is for getting instance
                 // for AuthUi and after that calling a
                 // sign out method from FIrebase.

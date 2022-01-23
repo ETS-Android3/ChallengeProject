@@ -6,9 +6,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 public class ProfileActivity extends AppCompatActivity {
 
@@ -16,6 +20,22 @@ public class ProfileActivity extends AppCompatActivity {
     private String displayName;
     private TextView displayNameTextView;
 
+    private String displayEmail;
+    private TextView displayEmailTextView;
+
+    private int displayAge;
+    private TextView displayAgeTextView;
+
+    private String displayPhone;
+    private TextView displayPhoneTextView;
+
+    private String displayGender;
+    private TextView displayGenderTextView;
+
+    private Button editProfileButton;
+
+    final FirebaseDatabase database = FirebaseDatabase.getInstance();
+    final DatabaseReference myRef = database.getReference("Users");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,6 +47,35 @@ public class ProfileActivity extends AppCompatActivity {
         displayName = user.getName();
         displayNameTextView = findViewById(R.id.displayNameTextView);
         displayNameTextView.setText(displayName);
+
+        // Sets the email to the email from Firebase Auth
+        displayEmail = user.getEmail();
+        displayEmailTextView = findViewById(R.id.emailTextView);
+        displayEmailTextView.setText(displayEmail);
+
+        // Sets the age to the display
+        displayAge = user.getAge();
+        displayAgeTextView = findViewById(R.id.ageTextView);
+        displayAgeTextView.setText(Integer.toString(displayAge));
+
+        // Sets the age to the display
+        displayPhone = user.getPhone();
+        displayPhoneTextView = findViewById(R.id.phoneTextView);
+        displayPhoneTextView.setText(displayPhone);
+
+        // Sets the age to the display
+        displayGender = user.getGender();
+        displayGenderTextView = findViewById(R.id.genderTextView);
+        displayGenderTextView.setText(displayGender);
+
+
+        editProfileButton = findViewById(R.id.editProfileButton);
+        editProfileButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                editProfile();
+            }
+        });
 
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
         bottomNavigationView.setSelectedItemId(R.id.profile);
@@ -49,5 +98,9 @@ public class ProfileActivity extends AppCompatActivity {
                 return false;
             }
         });
+    }
+
+    public void editProfile(){
+        startActivity(new Intent(getApplicationContext(), EditProfileActivity.class));
     }
 }

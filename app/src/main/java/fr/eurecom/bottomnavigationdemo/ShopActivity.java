@@ -64,36 +64,6 @@ public class ShopActivity extends AppCompatActivity {
         });
 
 
-        // button for logout and initialing our button.
-        Button logoutBtn = findViewById(R.id.idBtnLogout);
-
-        // adding onclick listener for our logout button.
-        logoutBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                User.logOut();
-                // below line is for getting instance
-                // for AuthUi and after that calling a
-                // sign out method from FIrebase.
-                AuthUI.getInstance()
-                        .signOut(ShopActivity.this)
-
-                        // after sign out is executed we are redirecting
-                        // our user to MainActivity where our login flow is being displayed.
-                        .addOnCompleteListener(new OnCompleteListener<Void>() {
-                            public void onComplete(@NonNull Task<Void> task) {
-
-                                // below method is used after logout from device.
-                                Toast.makeText(ShopActivity.this, "User Signed Out", Toast.LENGTH_SHORT).show();
-
-                                // below line is to go to MainActivity via an intent.
-                                Intent i = new Intent(ShopActivity.this, LoginActivity.class);
-                                startActivity(i);
-                            }
-                        });
-            }
-        });
-
 
 
         // Removes title bar

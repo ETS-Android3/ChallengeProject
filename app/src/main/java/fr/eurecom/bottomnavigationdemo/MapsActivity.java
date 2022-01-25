@@ -444,6 +444,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Users");
 
+
         ref.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DataSnapshot> task) {
@@ -455,6 +456,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             if (user.getUID() != keys) {
                                 //testing new marker:
                                 final long ONE_MEGABYTE = 1024 * 1024;
+                                DataSnapshot s = task.getResult();
                                 imageRef.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
                                     @Override
                                     public void onSuccess(byte[] bytes) {

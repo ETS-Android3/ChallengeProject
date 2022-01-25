@@ -465,7 +465,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                                         BitmapDescriptor bd = BitmapDescriptorFactory.fromBitmap(bmp);
                                         DataSnapshot snapshot = task.getResult();
-                                        String snippet = (String) snapshot.child("status").getValue();
+                                        String snippet = (String) snapshot.child(keys).child("status").getValue();
 
 
                                         GeoLocation usLoc = usersArray.get(keys);

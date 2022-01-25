@@ -39,6 +39,9 @@ public final class User {
     private String gender;
     private String phone;
 
+
+    private String status;
+
     private boolean visible;
 
     private Location location;
@@ -148,6 +151,18 @@ public final class User {
         ref.child("gender").setValue(this.getGender());
     }
 
+    public String getStatus() {
+        if (this.status == null) {
+            return "null";
+        }
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+        ref.child("status").setValue(this.getStatus());
+    }
+
     public String getPhone() {
         if (this.phone == null) {
             return "null";
@@ -201,6 +216,8 @@ public final class User {
             this.setAge(((Long) task.getResult().child("age").getValue()).intValue());
             this.setGender((String) task.getResult().child("gender").getValue());
             this.setPhone((String) task.getResult().child("phone").getValue());
+
+            this.setStatus((String) task.getResult().child("status").getValue());
         }
     }
 

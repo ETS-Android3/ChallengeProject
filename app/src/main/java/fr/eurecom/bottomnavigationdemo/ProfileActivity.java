@@ -52,6 +52,9 @@ public class ProfileActivity extends AppCompatActivity {
     private String displayGender;
     private TextView displayGenderTextView;
 
+    private String displayStatus;
+    private TextView displayStatusTextView;
+
     private Button editProfileButton;
 
     private ImageView imageView;
@@ -123,6 +126,11 @@ public class ProfileActivity extends AppCompatActivity {
         displayGender = user.getGender();
         displayGenderTextView = findViewById(R.id.genderTextView);
         displayGenderTextView.setText(displayGender);
+
+        // Sets the status to the display
+        displayStatus = user.getStatus();
+        displayStatusTextView = findViewById(R.id.statusTextView);
+        displayStatusTextView.setText(displayStatus);
 
 
         imageView = findViewById(R.id.ProfilePicImageView);

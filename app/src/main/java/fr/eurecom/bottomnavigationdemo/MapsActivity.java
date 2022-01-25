@@ -73,7 +73,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     HashMap<String, GeoLocation> usersArray = new HashMap<>();
 
-    private boolean firstTime = true;
 
     private final LocationListener mLocationListener = new LocationListener() {
         @Override
@@ -202,7 +201,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         return true;
 
                     case R.id.shop:
-                        startActivity(new Intent(getApplicationContext(), MessagesActivity.class));
+                        startActivity(new Intent(getApplicationContext(), ShopActivity.class));
                         overridePendingTransition(0, 0);
                         return true;
                     case R.id.map:
@@ -466,7 +465,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                         DataSnapshot snapshot = task.getResult();
                                         String snippet = (String) snapshot.child("status").getValue();
 
+
                                         GeoLocation usLoc = usersArray.get(keys);
+
+                                        if(usLoc == null) {
+                                            return;
+                                        }
                                         double lng = usLoc.longitude;
                                         double lat = usLoc.latitude;
                                         LatLng latLng = new LatLng(lat, lng);
@@ -534,7 +538,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     }
 
-
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Log.i("STOP", "onStop called");
+    }
 }
 
 

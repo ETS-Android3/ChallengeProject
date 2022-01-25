@@ -6,11 +6,11 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SyncStatusObserver;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
@@ -19,7 +19,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.TextView;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.firebase.geofire.GeoFire;
@@ -32,30 +32,27 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.firebase.ui.auth.AuthUI;
-import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 
-import java.security.Provider;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 
 import fr.eurecom.bottomnavigationdemo.databinding.ActivityMapsBinding;
 
@@ -63,6 +60,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     GeoFire geoFire;
     GeoQuery geoQuery;
+
+    private Button visibilityButton;
+    private boolean firstTime = true;
 
     //GeoQuery geoQuery = geoFire.queryAtLocation(new GeoLocation(location.getLatitude(), location.getLongitude()), 1.0);
 
@@ -77,14 +77,29 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         @Override
         public void onLocationChanged(final Location locationChanged) {
 
-            location = getLocation();
-            geoFire.setLocation(user.getUID(), new GeoLocation(location.getLatitude(), location.getLongitude()));
-            user.setLocation(location);
-            geoQuery = geoFire.queryAtLocation(new GeoLocation(location.getLatitude(), location.getLongitude()), 1.0);
-            usersArray.clear();
-            map.clear();
-            createGeoQuery();
-            updateLocationUI();
+            if(!(locationChanged.getLatitude() == location.getLatitude() && locationChanged.getLongitude() == location.getLongitude())) {
+                location = getLocation();
+                geoFire.setLocation(user.getUID(), new GeoLocation(location.getLatitude(), location.getLongitude()));
+                user.setLocation(location);
+                geoQuery = geoFire.queryAtLocation(new GeoLocation(location.getLatitude(), location.getLongitude()), 1.0);
+                usersArray.clear();
+                map.clear();
+                createGeoQuery();
+                updateLocationUI();
+            }
+
+            if(firstTime) {
+
+                location = getLocation();
+                geoFire.setLocation(user.getUID(), new GeoLocation(location.getLatitude(), location.getLongitude()));
+                user.setLocation(location);
+                geoQuery = geoFire.queryAtLocation(new GeoLocation(location.getLatitude(), location.getLongitude()), 1.0);
+                usersArray.clear();
+                map.clear();
+                createGeoQuery();
+                updateLocationUI();
+                firstTime = false;
+            }
 
         }
     };
@@ -158,6 +173,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //if they are not set, start activity to set credentials
         //TODO
 
+
         binding = ActivityMapsBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
@@ -183,7 +199,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         overridePendingTransition(0, 0);
                         return true;
 
-                    case R.id.messages:
+                    case R.id.shop:
                         startActivity(new Intent(getApplicationContext(), MessagesActivity.class));
                         overridePendingTransition(0, 0);
                         return true;
@@ -201,7 +217,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         //geoFire.setLocation("UserDemoStj", new GeoLocation(63.4684, 10.9172));
         //geoFire.setLocation("UserDemoFarAwayTrd", new GeoLocation(63.4250, 10.4428));
-
+        visibilityButton = findViewById(R.id.visibilityButton);
+        visibilityButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                toggleVisibility();
+            }
+        });
         createGeoQuery();
 
         Log.i("onCreate", "at end");
@@ -211,7 +233,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private void createGeoQuery() {
 
         geoQuery = geoFire.queryAtLocation(new GeoLocation(location.getLatitude(), location.getLongitude()), 1.0);
-
 
         final GeoQueryEventListener geoQueryEventListener = new GeoQueryEventListener() {
 
@@ -262,9 +283,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         geoQuery.addGeoQueryEventListener(geoQueryEventListener);
     }
-
-
-
 
     @Override
     protected void onPause() {
@@ -418,30 +436,98 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if (map == null) {
             return;
         }
-        try {
-            for(String keys : usersArray.keySet()) {
-                if(!user.getUID().equals(keys)) {
-                    GeoLocation usLoc = usersArray.get(keys);
-                    double lng = usLoc.longitude;
-                    double lat = usLoc.latitude;
-                    LatLng latLng = new LatLng(lat, lng);
-                    map.addMarker(new MarkerOptions().position(latLng).title(keys));
+        map.clear();
+        FirebaseStorage storage = FirebaseStorage.getInstance();
+        StorageReference imageRef = storage.getReferenceFromUrl("gs://challengeproject-334921.appspot.com/Avatars/Avatar1.png");
+
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Users");
+
+        ref.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DataSnapshot> task) {
+                if(task.isSuccessful()) {
+
+
+                    try {
+                        for (String keys : usersArray.keySet()) {
+                            if (user.getUID() != keys) {
+                                //testing new marker:
+                                final long ONE_MEGABYTE = 1024 * 1024;
+                                imageRef.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+                                    @Override
+                                    public void onSuccess(byte[] bytes) {
+                                        Bitmap bmp = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                                        //imageView.setImageBitmap(bmp);
+
+                                        BitmapDescriptor bd = BitmapDescriptorFactory.fromBitmap(bmp);
+                                        DataSnapshot snapshot = task.getResult();
+                                        String snippet = (String) snapshot.child("status").getValue();
+
+                                        GeoLocation usLoc = usersArray.get(keys);
+                                        double lng = usLoc.longitude;
+                                        double lat = usLoc.latitude;
+                                        LatLng latLng = new LatLng(lat, lng);
+                                        map.addMarker(new MarkerOptions()
+                                                .position(latLng)
+                                                .title((String) snapshot.child("name").getValue())
+                                                .icon(bd)
+                                                .snippet(snippet));
+                                        //map.addMarker(new MarkerOptions().position(latLng).title(keys).snippet("HEEEI"));
+                                        // map.addMarker(marker);
+
+
+                                        Log.i("Image", "success");
+
+                                    }
+                                }).addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception exception) {
+                                        Log.i("Image", "Error setting image");
+                                        GeoLocation usLoc = usersArray.get(keys);
+                                        double lng = usLoc.longitude;
+                                        double lat = usLoc.latitude;
+                                        LatLng latLng = new LatLng(lat, lng);
+                                        map.addMarker(new MarkerOptions().position(latLng).title(keys));
+                                    }
+                                });
+
+                            }
+                        }
+                    }
+                    catch (Exception e) {
+                        Log.e("Marker: ", "exception setting marker: " + e.toString());
+                    }
                 }
             }
-            if (locationPermissionGranted) {
-                map.setMyLocationEnabled(true);
-                map.getUiSettings().setMyLocationButtonEnabled(true);
+        });
+
+        if (locationPermissionGranted) {
+            map.setMyLocationEnabled(true);
+            map.getUiSettings().setMyLocationButtonEnabled(true);
 
 
-            } else {
-                map.setMyLocationEnabled(false);
-                map.getUiSettings().setMyLocationButtonEnabled(false);
-                lastKnownLocation = null;
-                getLocationPermission();
-            }
-        } catch (SecurityException e)  {
-            Log.e("Exception: %s", e.getMessage());
+        } else {
+            map.setMyLocationEnabled(false);
+            map.getUiSettings().setMyLocationButtonEnabled(false);
+            lastKnownLocation = null;
+            getLocationPermission();
         }
+    }
+
+    private void toggleVisibility(){
+        if (user.isVisible()){
+            user.setVisible(false);
+            user.setLocation(location);
+            Toast.makeText(getApplicationContext(),"You are no longer visible to other users",Toast.LENGTH_SHORT).show();
+            visibilityButton.setText("Invisible");
+        }
+        else{
+            user.setVisible(true);
+            user.setLocation(location);
+            Toast.makeText(getApplicationContext(),"You are now visible to other users",Toast.LENGTH_SHORT).show();
+            visibilityButton.setText("Visible");
+        }
+
     }
 
 

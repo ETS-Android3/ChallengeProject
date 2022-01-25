@@ -39,6 +39,8 @@ public final class User {
     private String gender;
     private String phone;
 
+    private boolean visible;
+
     private Location location;
     private LocationManager locationManager;
 
@@ -55,6 +57,7 @@ public final class User {
         this.name = auth.getCurrentUser().getDisplayName();
         this.email = auth.getCurrentUser().getEmail();
         this.location = fetchLocation();
+        this.visible = false;
 
         ref = FirebaseDatabase.getInstance().getReference("Users").child(UID);
         georef = FirebaseDatabase.getInstance().getReference("Locations");
@@ -71,7 +74,6 @@ public final class User {
                 }
             }
         });
-        Task<DataSnapshot> dataSnapshot = ref.get();
 
         setLocation(location);
     }
@@ -123,7 +125,6 @@ public final class User {
                 .build()
         );
         ref.child("name").setValue(this.getName());
-
     }
 
     public int getAge() {
@@ -166,8 +167,22 @@ public final class User {
 
     public void setLocation(Location location) {
         Log.i("User", "setLocation()");
-        geoFire.setLocation(this.getUID(), new GeoLocation(location.getLatitude(), location.getLongitude()));
-        // UPDATES
+        if(!isVisible()){
+            georef.child(this.getUID()).removeValue();
+        }
+        else{
+            geoFire.setLocation(this.getUID(), new GeoLocation(location.getLatitude(), location.getLongitude()));
+        }
+
+
+    }
+
+    public boolean isVisible(){
+        return this.visible;
+    }
+
+    public void setVisible(boolean bool){
+        this.visible = bool;
     }
 
     public Location fetchLocation() {

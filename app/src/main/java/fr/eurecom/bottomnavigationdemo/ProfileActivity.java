@@ -86,7 +86,7 @@ public class ProfileActivity extends AppCompatActivity {
                     case R.id.profile:
                         return true;
 
-                    case R.id.messages:
+                    case R.id.shop:
                         startActivity(new Intent(getApplicationContext(), MessagesActivity.class));
                         overridePendingTransition(0,0);
                         return true;

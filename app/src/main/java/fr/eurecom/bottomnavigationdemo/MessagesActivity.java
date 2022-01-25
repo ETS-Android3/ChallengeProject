@@ -7,8 +7,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.Toast;
 
@@ -62,7 +60,7 @@ public class MessagesActivity extends AppCompatActivity {
         getSupportActionBar().hide();
 
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
-        bottomNavigationView.setSelectedItemId(R.id.messages);
+        bottomNavigationView.setSelectedItemId(R.id.shop);
 
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
@@ -73,7 +71,7 @@ public class MessagesActivity extends AppCompatActivity {
                         overridePendingTransition(0,0);
                         return true;
 
-                    case R.id.messages:
+                    case R.id.shop:
                         return true;
 
                     case R.id.map:

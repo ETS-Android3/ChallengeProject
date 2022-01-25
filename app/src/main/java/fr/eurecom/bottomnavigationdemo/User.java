@@ -48,6 +48,9 @@ public final class User {
     private Location location;
     private LocationManager locationManager;
 
+    private String profilePictureURL;
+    private String avatarURL;
+
     DatabaseReference ref;
     DatabaseReference georef;
     GeoFire geoFire;
@@ -65,6 +68,8 @@ public final class User {
 
         ref = FirebaseDatabase.getInstance().getReference("Users").child(UID);
         ref.child("name").setValue(name);
+        ref.child("avatarURL").setValue("gs://challengeproject-334921.appspot.com/Avatars/Avatar1.png");
+
         georef = FirebaseDatabase.getInstance().getReference("Locations");
         geoFire = new GeoFire(georef);
 
@@ -188,6 +193,22 @@ public final class User {
 
     public void setVisible(boolean bool){
         this.visible = bool;
+    }
+
+    public String getProfilePictureURL(){
+        return this.profilePictureURL;
+    }
+
+    public void setProfilePictureURL(String url){
+        this.profilePictureURL = url;
+    }
+
+    public String getAvatarURL(){
+        return this.avatarURL;
+    }
+
+    public void setAvatarURL(String url){
+        this.avatarURL = url;
     }
 
     public Location fetchLocation() {

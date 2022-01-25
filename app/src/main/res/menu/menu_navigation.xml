@@ -3,8 +3,8 @@
 
     <item
         android:id="@+id/shop"
-        android:title="Messages"
-        android:icon="@drawable/ic_messages"/>
+        android:title="Shop"
+        android:icon="@drawable/ic_baseline_shopping_bag_24"/>
 
     <item
         android:id="@+id/map"

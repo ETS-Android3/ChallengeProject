@@ -178,5 +178,19 @@
         app:itemBackground="@color/design_default_color_background"
         app:itemIconTint="@drawable/selector"
         app:itemTextColor="@drawable/selector"
-        app:menu="@menu/menu_navigation" />
+        app:itemIconTint="@drawable/selector"
+        app:menu="@menu/menu_navigation"
+        android:layout_alignParentBottom="true"/>
+
+
+    <Button
+        android:id="@+id/idBtnLogout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="30dp"
+        android:layout_marginEnd="33dp"
+        android:text="Logout"
+        android:textAllCaps="false" />
 </RelativeLayout>

@@ -73,6 +73,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     HashMap<String, GeoLocation> usersArray = new HashMap<>();
 
+    private boolean firstTime = true;
+
     private final LocationListener mLocationListener = new LocationListener() {
         @Override
         public void onLocationChanged(final Location locationChanged) {
@@ -243,6 +245,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 for(String useKey : usersArray.keySet()) {
                     Log.i("UserKey: ", useKey+ " location: " +usersArray.get(useKey).toString());
                 }
+
                 updateLocationUI();
             }
 
@@ -263,7 +266,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 usersArray.put(key, geoLocation);
 
                 for(String useKey : usersArray.keySet()) {
-                    Log.i("UserKey: ", useKey+ "location: " +usersArray.get(useKey).toString());
+                    Log.i("Moved! in array: ", useKey+ "location: " +usersArray.get(useKey).toString());
                 }
                 updateLocationUI();
             }
@@ -498,6 +501,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         Log.e("Marker: ", "exception setting marker: " + e.toString());
                     }
                 }
+
             }
         });
 
@@ -532,4 +536,5 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
 }
+
 

@@ -64,6 +64,7 @@ public final class User {
         this.visible = false;
 
         ref = FirebaseDatabase.getInstance().getReference("Users").child(UID);
+        ref.child("name").setValue(name);
         georef = FirebaseDatabase.getInstance().getReference("Locations");
         geoFire = new GeoFire(georef);
 

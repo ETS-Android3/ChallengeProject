@@ -476,10 +476,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                         LatLng latLng = new LatLng(lat, lng);
                                         map.addMarker(new MarkerOptions()
                                                 .position(latLng)
-                                                .title((String) snapshot.child("name").getValue())
+                                                .title((String) snapshot.child(keys).child("name").getValue())
                                                 .icon(bd)
                                                 .snippet(snippet));
-                                        //map.addMarker(new MarkerOptions().position(latLng).title(keys).snippet("HEEEI"));
+                                        //Log.i("Marker: ", ""+(String) snapshot.child(keys).child("name").getValue());
+                                        //map.addMarker(new MarkerOptions().position(latLng).title((String) snapshot.child(keys).child("name").getValue()).snippet("HEEEI"));
                                         // map.addMarker(marker);
 
 

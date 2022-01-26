@@ -146,9 +146,6 @@ public class ProfileActivity extends AppCompatActivity {
 
         setImage();
 
-        //selectImage();
-
-
         editProfileButton = findViewById(R.id.editProfileButton);
         editProfileButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -186,10 +183,6 @@ public class ProfileActivity extends AppCompatActivity {
 
     //testing code to get Image:
 
-
-
-
-
     private Uri filePath;
     FirebaseStorage storage = FirebaseStorage.getInstance();
     StorageReference ref  = storage.getReference("/ProfilePictures");
@@ -219,55 +212,30 @@ public class ProfileActivity extends AppCompatActivity {
 
      }
 
-
-
-
     private final int PICK_IMAGE_REQUEST = 22;
-    private void selectImage()
-    {
+    private void selectImage() {
 
         // Defining Implicit Intent to mobile gallery
         Intent intent = new Intent();
         intent.setType("image/*");
         intent.setAction(Intent.ACTION_GET_CONTENT);
-        startActivityForResult(
-                Intent.createChooser(
-                        intent,
-                        "Select Image from here..."),
-                PICK_IMAGE_REQUEST);
+        startActivityForResult(Intent.createChooser(intent, "Select profile picture from: "), PICK_IMAGE_REQUEST);
+
     }
 
-
-
-    // Override onActivityResult method
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
         // checking request code and result code
-        // if request code is PICK_IMAGE_REQUEST and
-        // resultCode is RESULT_OK
-        // then set image in the image view
+        // setting the filepath of requested profile picture, and initializing upload
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null) {
 
-            // Get the Uri of data
             filePath = data.getData();
             Log.i("OnActivityResult: ", "filePath = "+filePath);
-            try {
 
-                // Setting image on image view using Bitmap
-                Bitmap bitmap = MediaStore
-                        .Images
-                        .Media
-                        .getBitmap(getContentResolver(), filePath);
-                //imageView.setImageBitmap(bitmap);
-                uploadImage();
-            }
+            uploadImage();
 
-            catch (IOException e) {
-                // Log the exception
-                e.printStackTrace();
-            }
         }
     }
 
@@ -277,9 +245,8 @@ public class ProfileActivity extends AppCompatActivity {
         if (filePath != null) {
 
             // Code for showing progressDialog while uploading
-            ProgressDialog progressDialog
-                    = new ProgressDialog(this);
-            progressDialog.setTitle("Uploading...");
+            ProgressDialog progressDialog = new ProgressDialog(this);
+            progressDialog.setTitle("Uploading");
             progressDialog.show();
 
             // Defining the child of storageReference
@@ -320,22 +287,13 @@ public class ProfileActivity extends AppCompatActivity {
                         }
                     })
                     .addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
-
-                                // Progress Listener for loading
-                                // percentage on the dialog box
-                                @Override
-                                public void onProgress(
-                                        UploadTask.TaskSnapshot taskSnapshot)
-                                {
-                                    double progress
-                                            = (100.0
-                                            * taskSnapshot.getBytesTransferred()
-                                            / taskSnapshot.getTotalByteCount());
-                                    progressDialog.setMessage(
-                                            "Uploaded "
-                                                    + (int)progress + "%");
-                                }
-                            });
+                        // Showing progress of upload:
+                        @Override
+                        public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
+                            double progress = (100.0 * taskSnapshot.getBytesTransferred() / taskSnapshot.getTotalByteCount());
+                            progressDialog.setMessage("Uploaded " + (int)progress + "%");
+                        }
+                    });
         }
     }
 }

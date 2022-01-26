@@ -12,7 +12,7 @@ import android.widget.Toast;
 
 public class EditProfileActivity extends AppCompatActivity {
     private User user = User.getInstance();
-    private EditText etPhone, etGender, etAge;
+    private EditText etPhone, etGender, etAge, etStatus;
 
 
     @Override
@@ -27,6 +27,8 @@ public class EditProfileActivity extends AppCompatActivity {
         etPhone = findViewById(R.id.et_phone_number);
         etGender = findViewById(R.id.et_gender);
         etAge = findViewById(R.id.et_age);
+        etStatus = findViewById(R.id.et_status);
+
 
         // To show back button in actionbar
         //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -63,10 +65,12 @@ public class EditProfileActivity extends AppCompatActivity {
             String phoneNumber = etPhone.getText().toString();
             String gender = etGender.getText().toString();
             String age = etAge.getText().toString();
+            String status = etStatus.getText().toString();
 
             user.setPhone(phoneNumber);
             user.setAge(Integer.parseInt(age));
             user.setGender(gender);
+            user.setStatus(status);
 
             Toast.makeText(this,"Profile Update Successfully",Toast.LENGTH_SHORT).show();
             // Here you can call you API

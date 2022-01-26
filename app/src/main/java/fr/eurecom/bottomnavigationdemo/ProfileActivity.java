@@ -3,20 +3,36 @@ package fr.eurecom.bottomnavigationdemo;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.OnProgressListener;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
+
+import java.io.IOException;
+import java.util.UUID;
 
 public class ProfileActivity extends AppCompatActivity {
 
@@ -36,7 +52,14 @@ public class ProfileActivity extends AppCompatActivity {
     private String displayGender;
     private TextView displayGenderTextView;
 
+    private String displayStatus;
+    private TextView displayStatusTextView;
+
     private Button editProfileButton;
+
+    private ImageView imageView;
+    private Button setProfilePicBtn;
+
 
     final FirebaseDatabase database = FirebaseDatabase.getInstance();
     final DatabaseReference myRef = database.getReference("Users");
@@ -104,6 +127,24 @@ public class ProfileActivity extends AppCompatActivity {
         displayGenderTextView = findViewById(R.id.genderTextView);
         displayGenderTextView.setText(displayGender);
 
+        // Sets the status to the display
+        displayStatus = user.getStatus();
+        displayStatusTextView = findViewById(R.id.statusTextView);
+        displayStatusTextView.setText(displayStatus);
+
+
+        imageView = findViewById(R.id.ProfilePicImageView);
+
+
+        setProfilePicBtn = findViewById(R.id.idBtnAddProfilePic);
+        setProfilePicBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                selectImage();
+            }
+        });
+
+        setImage();
 
         editProfileButton = findViewById(R.id.editProfileButton);
         editProfileButton.setOnClickListener(new View.OnClickListener() {
@@ -138,5 +179,121 @@ public class ProfileActivity extends AppCompatActivity {
 
     public void editProfile(){
         startActivity(new Intent(getApplicationContext(), EditProfileActivity.class));
+    }
+
+    //testing code to get Image:
+
+    private Uri filePath;
+    FirebaseStorage storage = FirebaseStorage.getInstance();
+    StorageReference ref  = storage.getReference("/ProfilePictures");
+
+    StorageReference imageRef = storage.getReferenceFromUrl("gs://challengeproject-334921.appspot.com/ProfilePictures/"+user.getUID());
+
+    final long ONE_MEGABYTE = 1024 * 1024;
+
+     private void setImage() {
+
+         imageRef.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+             @Override
+             public void onSuccess(byte[] bytes) {
+                 Bitmap bmp = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                 imageView.setImageBitmap(bmp);
+                 Log.i("Image", "success");
+
+             }
+         }).addOnFailureListener(new OnFailureListener() {
+             @Override
+             public void onFailure(@NonNull Exception exception) {
+                 Toast.makeText(ProfileActivity.this,"Profile picture could not be loaded/set correctly try uploading a new one", Toast.LENGTH_SHORT).show();
+
+                 Log.i("Image", "Error setting image");
+             }
+         });
+
+     }
+
+    private final int PICK_IMAGE_REQUEST = 22;
+    private void selectImage() {
+
+        // Defining Implicit Intent to mobile gallery
+        Intent intent = new Intent();
+        intent.setType("image/*");
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(Intent.createChooser(intent, "Select profile picture from: "), PICK_IMAGE_REQUEST);
+
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        // checking request code and result code
+        // setting the filepath of requested profile picture, and initializing upload
+        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null) {
+
+            filePath = data.getData();
+            Log.i("OnActivityResult: ", "filePath = "+filePath);
+
+            uploadImage();
+
+        }
+    }
+
+
+
+    private void uploadImage() {
+        if (filePath != null) {
+
+            // Code for showing progressDialog while uploading
+            ProgressDialog progressDialog = new ProgressDialog(this);
+            progressDialog.setTitle("Uploading");
+            progressDialog.show();
+
+            // Defining the child of storageReference
+            StorageReference StorRef = ref.child(user.getUID());//"images/" + UUID.randomUUID().toString());
+
+            // adding listeners on upload
+            // or failure of image
+            StorRef.putFile(filePath)
+                    .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+
+                                    // Image uploaded successfully
+                                    // Dismiss dialog
+                            progressDialog.dismiss();
+                            Toast.makeText(ProfileActivity.this,"Profile picture uploaded!", Toast.LENGTH_SHORT).show();
+                            setImage();
+
+                           try {
+                               Bitmap bitmap = MediaStore
+                                       .Images
+                                       .Media
+                                       .getBitmap(getContentResolver(), filePath);
+                               imageView.setImageBitmap(bitmap);
+                           } catch (Exception e) {
+                               Log.e("upLoadImage: ", "error setting image: "+e.toString());
+                           }
+                        }
+                    })
+
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+
+                            // Error, Image not uploaded
+                            progressDialog.dismiss();
+                            Toast.makeText(ProfileActivity.this,"Failed " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        }
+                    })
+                    .addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
+                        // Showing progress of upload:
+                        @Override
+                        public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
+                            double progress = (100.0 * taskSnapshot.getBytesTransferred() / taskSnapshot.getTotalByteCount());
+                            progressDialog.setMessage("Uploaded " + (int)progress + "%");
+                        }
+                    });
+        }
     }
 }

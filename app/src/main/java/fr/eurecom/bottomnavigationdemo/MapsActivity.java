@@ -315,7 +315,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
      * it inside the SupportMapFragment. This method will only be triggered once the user has
      * installed Google Play services and returned to the app.
      */
-
     @Override
     public void onMapReady(GoogleMap map) {
         this.map = map;
@@ -441,21 +440,23 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
         map.clear();
         FirebaseStorage storage = FirebaseStorage.getInstance();
-        //StorageReference imageRef = storage.getReferenceFromUrl("gs://challengeproject-334921.appspot.com/Avatars/Avatar1.png");
+        StorageReference imageRef = storage.getReferenceFromUrl("gs://challengeproject-334921.appspot.com/Avatars/Avatar1.png");
 
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Users");
+
 
         ref.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DataSnapshot> task) {
                 if(task.isSuccessful()) {
 
+
                     try {
                         for (String keys : usersArray.keySet()) {
                             if (user.getUID() != keys) {
                                 //testing new marker:
                                 final long ONE_MEGABYTE = 1024 * 1024;
-                                StorageReference imageRef = storage.getReferenceFromUrl( (String) task.getResult().child(keys).child("avatarURL").getValue());
+                                DataSnapshot s = task.getResult();
                                 imageRef.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
                                     @Override
                                     public void onSuccess(byte[] bytes) {
@@ -464,7 +465,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                                         BitmapDescriptor bd = BitmapDescriptorFactory.fromBitmap(bmp);
                                         DataSnapshot snapshot = task.getResult();
-                                        String snippet = (String) snapshot.child("status").getValue();
+                                        String snippet = (String) snapshot.child(keys).child("status").getValue();
 
 
                                         GeoLocation usLoc = usersArray.get(keys);

@@ -56,13 +56,17 @@ import java.util.HashMap;
 
 import fr.eurecom.bottomnavigationdemo.databinding.ActivityMapsBinding;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
+public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnInfoWindowClickListener, GoogleMap.OnInfoWindowCloseListener {
 
     GeoFire geoFire;
     GeoQuery geoQuery;
 
     private Button visibilityButton;
     private boolean firstTime = true;
+
+    // Connect to user button
+    private Button connectButton;
+    private boolean showConnect = false;
 
     //GeoQuery geoQuery = geoFire.queryAtLocation(new GeoLocation(location.getLatitude(), location.getLongitude()), 1.0);
 
@@ -225,6 +229,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 toggleVisibility();
             }
         });
+
+        // Create connectButton
+        connectButton = findViewById(R.id.connectButton);
+        connectButton.setVisibility(View.INVISIBLE);
+        connectButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                connectUser();
+            }
+        });
+
         createGeoQuery();
 
         Log.i("onCreate", "at end");
@@ -545,6 +560,29 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     protected void onStop() {
         super.onStop();
         Log.i("STOP", "onStop called");
+    }
+
+
+    // Connect to user method runs once button has been clicked.
+    private void connectUser() {
+        // TODO: find out how to send request
+    }
+
+    // This shows the connectButton when marker is tapped
+    @Override
+    public void onInfoWindowClick(@NonNull Marker marker) {
+        this.showConnect = true;
+        connectButton.setVisibility(View.VISIBLE);
+        connectButton.setText("Connect to " + marker.getTitle() + "!");
+
+    }
+
+
+    // This hides the connectButton when marker is closed
+    @Override
+    public void onInfoWindowClose(@NonNull Marker marker) {
+        this.showConnect = false;
+        connectButton.setVisibility(View.INVISIBLE);
     }
 }
 

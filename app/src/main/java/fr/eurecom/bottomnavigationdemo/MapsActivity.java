@@ -349,7 +349,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         // Get the current location of the device and set the position of the map.
         getDeviceLocation();
 
-        //createGeoQuery(geoFire, location);
     }
 
     /**
@@ -445,6 +444,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Users");
 
+
         ref.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DataSnapshot> task) {
@@ -464,7 +464,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                                         BitmapDescriptor bd = BitmapDescriptorFactory.fromBitmap(bmp);
                                         DataSnapshot snapshot = task.getResult();
-                                        String snippet = (String) snapshot.child("status").getValue();
+                                        String snippet = (String) snapshot.child(keys).child("status").getValue();
 
 
                                         GeoLocation usLoc = usersArray.get(keys);

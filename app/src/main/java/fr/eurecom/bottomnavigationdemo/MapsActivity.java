@@ -44,6 +44,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -67,6 +68,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     // Connect to user button
     private Button connectButton;
     private boolean showConnect = false;
+    private String connectToUser = "";
+
+    // Receive TODO
 
     //GeoQuery geoQuery = geoFire.queryAtLocation(new GeoLocation(location.getLatitude(), location.getLongitude()), 1.0);
 
@@ -565,7 +569,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     // Connect to user method runs once button has been clicked.
     private void connectUser() {
-        // TODO: find out how to send request
+
+        // Read the input field and push a new instance
+        // of ConnectionRequest to the Firebase database
+        FirebaseDatabase.getInstance()
+                .getReference()
+                .push()
+                .setValue(new ConnectionRequest(this.connectToUser,
+                        FirebaseAuth.getInstance()
+                                .getCurrentUser()
+                                .getDisplayName())
+                );
+
+
     }
 
     // This shows the connectButton when marker is tapped
@@ -574,7 +590,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         this.showConnect = true;
         connectButton.setVisibility(View.VISIBLE);
         connectButton.setText("Connect to " + marker.getTitle() + "!");
-
+        this.connectToUser = marker.getTitle();
     }
 
 
@@ -583,6 +599,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onInfoWindowClose(@NonNull Marker marker) {
         this.showConnect = false;
         connectButton.setVisibility(View.INVISIBLE);
+        this.connectToUser = "";
+
     }
 }
 

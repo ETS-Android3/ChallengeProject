@@ -348,7 +348,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         // Get the current location of the device and set the position of the map.
         getDeviceLocation();
 
-        //createGeoQuery(geoFire, location);
     }
 
     /**

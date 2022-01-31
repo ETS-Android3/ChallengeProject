@@ -1,5 +1,4 @@
 <resources>
     <string name="app_name">BottomNavigationDemo</string>
     <string name="title_activity_maps">MapsActivity</string>
-    <string name="default_notification_channel_id">1</string>
 </resources>

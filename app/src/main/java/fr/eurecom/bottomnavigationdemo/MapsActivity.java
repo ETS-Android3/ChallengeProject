@@ -6,6 +6,7 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -20,6 +21,7 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import com.firebase.geofire.GeoFire;
@@ -49,10 +51,13 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 
 import fr.eurecom.bottomnavigationdemo.databinding.ActivityMapsBinding;
@@ -70,11 +75,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private boolean showConnect = false;
     private String connectToUser = "";
 
-    // Accept request button
-    private Button acceptButton;
-
 
     // Receive TODO
+
 
     //GeoQuery geoQuery = geoFire.queryAtLocation(new GeoLocation(location.getLatitude(), location.getLongitude()), 1.0);
 
@@ -245,6 +248,36 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void onClick(View view) {
                 connectUser();
+            }
+        });
+
+        // Create pendingRequests list view
+        final FirebaseDatabase database = FirebaseDatabase.getInstance();
+        final DatabaseReference myRef = database.getReference("ConnectionRequest");
+
+        final ArrayList<ConnectionRequest> requestsArray = new ArrayList<>();
+        final RequestAdapter adapter = new RequestAdapter(this, requestsArray);
+
+        final ListView listView = findViewById(R.id.pendingRequests);
+        listView.setAdapter(adapter);
+
+        myRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                requestsArray.clear();
+                adapter.clear();
+
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    ConnectionRequest read_user = dataSnapshot.getValue(ConnectionRequest.class);
+                    read_user.setMessageUser(dataSnapshot.getKey());
+                    requestsArray.add(read_user);
+                    adapter.notifyDataSetChanged();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
             }
         });
 
@@ -457,6 +490,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         updateLocationUI();
     }
 
+    @SuppressLint("MissingPermission")
     private void updateLocationUI() {
         if (map == null) {
             return;

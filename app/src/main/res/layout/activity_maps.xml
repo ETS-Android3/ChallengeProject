@@ -16,37 +16,6 @@
         android:layout_height="match_parent"
         tools:context=".MapsActivity" />
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/visibilityButton"
-        android:layout_marginTop="523dp"
-        android:orientation="vertical">
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <Button
-                android:id="@+id/acceptButton"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Accept" />
-        </RelativeLayout>
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <Button
-                android:id="@+id/connectButton"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Connect" />
-        </RelativeLayout>
-
-    </LinearLayout>
-
     <Button
         android:id="@+id/visibilityButton"
         android:layout_width="wrap_content"
@@ -63,4 +32,35 @@ app:itemTextColor="@drawable/selector"
 app:itemIconTint="@drawable/selector"
 app:menu="@menu/menu_navigation"
 android:layout_alignParentBottom="true"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="240dp"
+        android:layout_below="@+id/visibilityButton"
+        android:layout_marginTop="377dp"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <Button
+                android:id="@+id/connectButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Connect" />
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ListView
+                android:id="@+id/pendingRequests"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+        </RelativeLayout>
+
+    </LinearLayout>
 </RelativeLayout>

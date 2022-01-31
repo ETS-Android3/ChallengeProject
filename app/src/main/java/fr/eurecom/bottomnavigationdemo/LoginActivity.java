@@ -123,27 +123,7 @@ public class LoginActivity extends AppCompatActivity {
             }
         };
 
-        // Might delete this.
-        // Retrieve registration token
-        FirebaseMessaging.getInstance().getToken()
-                .addOnCompleteListener(new OnCompleteListener<String>() {
-                    @Override
-                    public void onComplete(@NonNull Task<String> task) {
-                        if (!task.isSuccessful()) {
-                            Log.w("TOKEN", "Fetching FCM registration token failed", task.getException());
-                            return;
-                        }
-
-                        // Get new FCM registration token
-                        String token = task.getResult();
-
-                        // Log and toast
-                        //String msg = getString(R.string.msg_token_fmt, token);
-                        String msg = "Connection token" + token;
-                        Log.d("TOKEN", msg);
-                        Toast.makeText(LoginActivity.this, msg, Toast.LENGTH_SHORT).show();
-                    }
-                });
+        
     }
 
     @Override

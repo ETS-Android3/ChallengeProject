@@ -70,6 +70,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private boolean showConnect = false;
     private String connectToUser = "";
 
+    // Accept request button
+    private Button acceptButton;
+
+
     // Receive TODO
 
     //GeoQuery geoQuery = geoFire.queryAtLocation(new GeoLocation(location.getLatitude(), location.getLongitude()), 1.0);

@@ -83,6 +83,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     // Receive TODO
     private TextView connectedText;
     boolean listViewVisible = false;
+    private Button toggleRequestsButton;
+    private ListView listView;
 
 
     //GeoQuery geoQuery = geoFire.queryAtLocation(new GeoLocation(location.getLatitude(), location.getLongitude()), 1.0);
@@ -261,6 +263,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         // Received text field
         connectedText = findViewById(R.id.connectedText);
         connectedText.setVisibility(View.INVISIBLE);
+        connectedText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                closeConnectedText();
+            }
+        });
+
+        // Toggle listView requests button
+        toggleRequestsButton = findViewById(R.id.toggleRequestsButton);
+        toggleRequestsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                toggleRequestsView();
+            }
+        });
 
         // Create pendingRequests list view
         final FirebaseDatabase database = FirebaseDatabase.getInstance();
@@ -269,9 +286,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         final ArrayList<ConnectionRequest> requestsArray = new ArrayList<>();
         final RequestAdapter adapter = new RequestAdapter(this, requestsArray);
 
-        final ListView listView = findViewById(R.id.pendingRequests);
+        listView = findViewById(R.id.pendingRequests);
         listView.setAdapter(adapter);
-
         listView.setBackgroundColor(Color.WHITE);
         listView.setVisibility(View.INVISIBLE);
 
@@ -308,7 +324,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                         if (type.equalsIgnoreCase("REQUEST")) {
                             Log.d("JAN", "GOT REQUEST2");
-                            listViewVisible = true;
                             requestsArray.add(read_request);
                             adapter.notifyDataSetChanged();
                         } else {
@@ -320,11 +335,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             connectedText.setText(fromUser + " has accepted you request!");
                         }
                     }
-                }
-                if (listViewVisible) {
-                    Log.d("JAN", "list view visible");
-
-                    listView.setVisibility(View.VISIBLE);
                 }
             }
 
@@ -722,6 +732,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 );
     }
 
+    private void closeConnectedText() {
+        connectedText.setVisibility(View.INVISIBLE);
+    }
+
+    private void toggleRequestsView() {
+        if (listViewVisible) {
+            listView.setVisibility(View.INVISIBLE);
+            listViewVisible = false;
+        } else {
+            listView.setVisibility(View.VISIBLE);
+            listViewVisible = true;
+        }
+    }
 
 
 }

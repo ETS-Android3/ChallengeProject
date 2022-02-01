@@ -31,20 +31,26 @@ app:itemBackground="@color/design_default_color_background"
 app:itemTextColor="@drawable/selector"
 app:itemIconTint="@drawable/selector"
 app:menu="@menu/menu_navigation"
-android:layout_alignParentBottom="true"/>
+android:layout_alignParentBottom="true">
+
+    </com.google.android.material.bottomnavigation.BottomNavigationView>
+
+    <TextView
+        android:id="@+id/connectedText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="false"
+        android:layout_centerVertical="true"
+        android:text="Connected to USER"
+        android:textAlignment="center"
+        android:textSize="16sp" />
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="248dp"
+        android:layout_height="244dp"
         android:layout_below="@+id/visibilityButton"
-        android:layout_marginTop="369dp"
+        android:layout_marginTop="373dp"
         android:orientation="vertical">
-
-        <TextView
-            android:id="@+id/connectedText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Connected to USER" />
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -69,5 +75,18 @@ android:layout_alignParentBottom="true"/>
         </RelativeLayout>
 
     </LinearLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="603dp">
+
+        <Button
+            android:id="@+id/toggleRequestsButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
+            android:text="Requests" />
+    </RelativeLayout>
 
 </RelativeLayout>

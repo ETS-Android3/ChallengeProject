@@ -237,7 +237,7 @@ public final class User {
 
     private void updateUserData(Task<DataSnapshot> task) {
         if (task.getResult().child("age").getValue() != null ||
-                task.getResult().child("phone").getValue() != null ||
+                task.getResult().child("gender").getValue() != null ||
                 task.getResult().child("phone").getValue() != null) {
             this.setAge(((Long) task.getResult().child("age").getValue()).intValue());
             this.setGender((String) task.getResult().child("gender").getValue());

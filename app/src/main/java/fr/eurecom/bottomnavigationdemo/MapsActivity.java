@@ -65,7 +65,7 @@ import java.util.HashMap;
 
 import fr.eurecom.bottomnavigationdemo.databinding.ActivityMapsBinding;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnInfoWindowClickListener, GoogleMap.OnInfoWindowCloseListener {
+public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     GeoFire geoFire;
     GeoQuery geoQuery;
@@ -203,6 +203,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+
         // Construct a PlacesClient
         Places.initialize(getApplicationContext(), Integer.toString(R.string.google_maps_key));
 
@@ -272,11 +273,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         listView.setVisibility(View.INVISIBLE);
 
-
         myRef.addValueEventListener(new ValueEventListener() {
 
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
+                Log.d("JAN", "DATA CHANGED");
+
 
                 requestsArray.clear();
                 adapter.clear();
@@ -286,16 +288,24 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     //read_request.setMessageUser(dataSnapshot.getKey());
                     String[] message = read_request.getMessageText().split(" ");
                     String type = message[0];
-                    String recipient = message[1];
+                    String recipient = "";
+                    for (int i =1; i< message.length; i++) {
+                        recipient += " " + message[i];
+                    }
+                    recipient = recipient.trim();
+                    
                     String fromUser = read_request.getMessageUser();
                     if (recipient.toUpperCase() == user.getName()) {
                         if (type.toUpperCase() == "REQUEST") {
+                            Log.d("JAN", "GOT REQUEST");
                             listViewVisible = true;
                             requestsArray.add(read_request);
                             adapter.notifyDataSetChanged();
                         } else {
                             // CONFIRMATION
                             // Send confirmation back
+                            Log.d("JAN", "GOT CONFIRMATION");
+
                             connectedText.setVisibility(View.VISIBLE);
                             connectedText.setText(fromUser + " has accepted you request!");
                         }
@@ -454,6 +464,37 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         getDeviceLocation();
 
         //createGeoQuery(geoFire, location);
+
+        // Add InfoWindowClick to map
+        map.setOnInfoWindowClickListener(
+                new GoogleMap.OnInfoWindowClickListener() {
+                    // This shows the connectButton when marker is tapped
+                    @Override
+                    public void onInfoWindowClick(@NonNull Marker marker) {
+                        Log.d("JAN", "CLICKED MARKER1");
+
+                        showConnect = true;
+                        connectButton.setVisibility(View.VISIBLE);
+                        connectButton.setText("Connect to " + marker.getTitle() + "!");
+                        connectToUser = marker.getTitle();
+                        Log.d("JAN", "CLICKED MARKER");
+                    }
+                }
+        );
+
+        map.setOnInfoWindowCloseListener(
+                new GoogleMap.OnInfoWindowCloseListener() {
+                    // This hides the connectButton when marker is closed
+                    @Override
+                    public void onInfoWindowClose(@NonNull Marker marker) {
+                        showConnect = false;
+                        connectButton.setVisibility(View.INVISIBLE);
+                        connectToUser = "";
+                        Log.d("JAN", "CLOSED MARKER");
+
+                    }
+                }
+        );
     }
 
     /**
@@ -669,24 +710,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 );
     }
 
-    // This shows the connectButton when marker is tapped
-    @Override
-    public void onInfoWindowClick(@NonNull Marker marker) {
-        this.showConnect = true;
-        connectButton.setVisibility(View.VISIBLE);
-        connectButton.setText("Connect to " + marker.getTitle() + "!");
-        this.connectToUser = marker.getTitle();
-    }
 
-
-    // This hides the connectButton when marker is closed
-    @Override
-    public void onInfoWindowClose(@NonNull Marker marker) {
-        this.showConnect = false;
-        connectButton.setVisibility(View.INVISIBLE);
-        this.connectToUser = "";
-
-    }
 
 }
 

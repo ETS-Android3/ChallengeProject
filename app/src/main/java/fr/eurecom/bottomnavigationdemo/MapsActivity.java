@@ -12,6 +12,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
@@ -271,6 +272,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         final ListView listView = findViewById(R.id.pendingRequests);
         listView.setAdapter(adapter);
 
+        listView.setBackgroundColor(Color.WHITE);
         listView.setVisibility(View.INVISIBLE);
 
         myRef.addValueEventListener(new ValueEventListener() {
@@ -284,20 +286,28 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 adapter.clear();
 
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+
                     ConnectionRequest read_request = dataSnapshot.getValue(ConnectionRequest.class);
                     //read_request.setMessageUser(dataSnapshot.getKey());
                     String[] message = read_request.getMessageText().split(" ");
                     String type = message[0];
+                    Log.d("JAN", "type:!"+type+"!");
+
                     String recipient = "";
                     for (int i =1; i< message.length; i++) {
                         recipient += " " + message[i];
                     }
                     recipient = recipient.trim();
-                    
+                    Log.d("JAN", "recipient:!"+recipient+"!");
+                    Log.d("JAN", "myusername:!"+user.getName()+"!");
+
+
                     String fromUser = read_request.getMessageUser();
-                    if (recipient.toUpperCase() == user.getName()) {
-                        if (type.toUpperCase() == "REQUEST") {
-                            Log.d("JAN", "GOT REQUEST");
+                    if (recipient.equalsIgnoreCase(user.getName())) {
+                        Log.d("JAN", "GOT REQUEST1");
+
+                        if (type.equalsIgnoreCase("REQUEST")) {
+                            Log.d("JAN", "GOT REQUEST2");
                             listViewVisible = true;
                             requestsArray.add(read_request);
                             adapter.notifyDataSetChanged();
@@ -312,6 +322,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     }
                 }
                 if (listViewVisible) {
+                    Log.d("JAN", "list view visible");
+
                     listView.setVisibility(View.VISIBLE);
                 }
             }

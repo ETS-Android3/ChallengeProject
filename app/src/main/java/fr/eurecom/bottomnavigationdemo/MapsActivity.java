@@ -62,6 +62,7 @@ import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 
 import fr.eurecom.bottomnavigationdemo.databinding.ActivityMapsBinding;
@@ -334,6 +335,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             connectedText.setVisibility(View.VISIBLE);
                             connectedText.setText(fromUser + " has accepted you request!");
                         }
+                    }
+
+                    long currentTime = new Date().getTime();
+                    long timeBeforeRequestDeletion = 1000*60*10; // 10 min
+                    if (currentTime - read_request.getMessageTime() > timeBeforeRequestDeletion) {
+                        dataSnapshot.getRef().removeValue();
                     }
                 }
             }

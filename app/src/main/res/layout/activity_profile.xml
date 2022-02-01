@@ -12,12 +12,11 @@
         android:id="@+id/ProfilePicImageView"
         android:layout_width="142dp"
         android:layout_height="142dp"
-        android:layout_above="@+id/LinLayout"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
         android:layout_marginStart="134dp"
         android:layout_marginTop="69dp"
-        android:layout_marginBottom="26dp"
         android:alpha="50"
         app:srcCompat="@drawable/profile" />
 
@@ -25,7 +24,9 @@
         android:id="@+id/LinLayout"
         android:layout_width="match_parent"
         android:layout_height="258dp"
-        android:layout_centerInParent="true"
+        android:layout_below="@+id/ProfilePicImageView"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="26dp"
         android:orientation="vertical">
 
         <Button
@@ -252,12 +253,10 @@
         android:id="@+id/idBtnAddProfilePic"
         android:layout_width="36dp"
         android:layout_height="37dp"
-        android:layout_alignStart="@+id/imageView"
         android:layout_alignTop="@+id/ProfilePicImageView"
         android:layout_alignEnd="@+id/ProfilePicImageView"
-        android:layout_marginStart="159dp"
-        android:layout_marginTop="2dp"
-        android:layout_marginEnd="22dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginEnd="4dp"
         android:layout_marginRight="138dp"
         android:background="#000000"
         android:paddingLeft="5dp"

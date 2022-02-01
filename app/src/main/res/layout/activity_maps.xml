@@ -35,10 +35,16 @@ android:layout_alignParentBottom="true"/>
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="240dp"
+        android:layout_height="248dp"
         android:layout_below="@+id/visibilityButton"
-        android:layout_marginTop="377dp"
+        android:layout_marginTop="369dp"
         android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/connectedText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Connected to USER" />
 
         <RelativeLayout
             android:layout_width="match_parent"

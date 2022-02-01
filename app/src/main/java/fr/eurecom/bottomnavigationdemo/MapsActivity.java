@@ -16,12 +16,15 @@ import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.firebase.geofire.GeoFire;
@@ -77,6 +80,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
     // Receive TODO
+    private TextView connectedText;
+    boolean listViewVisible = false;
 
 
     //GeoQuery geoQuery = geoFire.queryAtLocation(new GeoLocation(location.getLatitude(), location.getLongitude()), 1.0);
@@ -251,6 +256,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         });
 
+        // Received text field
+        connectedText = findViewById(R.id.connectedText);
+        connectedText.setVisibility(View.INVISIBLE);
+
         // Create pendingRequests list view
         final FirebaseDatabase database = FirebaseDatabase.getInstance();
         final DatabaseReference myRef = database.getReference("ConnectionRequest");
@@ -261,23 +270,63 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         final ListView listView = findViewById(R.id.pendingRequests);
         listView.setAdapter(adapter);
 
+        listView.setVisibility(View.INVISIBLE);
+
+
         myRef.addValueEventListener(new ValueEventListener() {
+
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
+
                 requestsArray.clear();
                 adapter.clear();
 
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                    ConnectionRequest read_user = dataSnapshot.getValue(ConnectionRequest.class);
-                    read_user.setMessageUser(dataSnapshot.getKey());
-                    requestsArray.add(read_user);
-                    adapter.notifyDataSetChanged();
+                    ConnectionRequest read_request = dataSnapshot.getValue(ConnectionRequest.class);
+                    //read_request.setMessageUser(dataSnapshot.getKey());
+                    String[] message = read_request.getMessageText().split(" ");
+                    String type = message[0];
+                    String recipient = message[1];
+                    String fromUser = read_request.getMessageUser();
+                    if (recipient.toUpperCase() == user.getName()) {
+                        if (type.toUpperCase() == "REQUEST") {
+                            listViewVisible = true;
+                            requestsArray.add(read_request);
+                            adapter.notifyDataSetChanged();
+                        } else {
+                            // CONFIRMATION
+                            // Send confirmation back
+                            connectedText.setVisibility(View.VISIBLE);
+                            connectedText.setText(fromUser + " has accepted you request!");
+                        }
+                    }
+                }
+                if (listViewVisible) {
+                    listView.setVisibility(View.VISIBLE);
                 }
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
+                Log.w("REQUEST", "loadRequest:onCancelled", error.toException());
 
+            }
+        });
+
+        // Accept connection request when clicking on listview
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                String user = requestsArray.get(position).getMessageUser();
+                Log.d("JAN", user);
+                FirebaseDatabase.getInstance()
+                        .getReference("ConnectionRequest")
+                        .push()
+                        .setValue(new ConnectionRequest("CONFIRMATION " + user,
+                                FirebaseAuth.getInstance()
+                                        .getCurrentUser()
+                                        .getDisplayName())
+                        );
             }
         });
 
@@ -611,15 +660,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         // Read the input field and push a new instance
         // of ConnectionRequest to the Firebase database
         FirebaseDatabase.getInstance()
-                .getReference()
+                .getReference("ConnectionRequest")
                 .push()
-                .setValue(new ConnectionRequest(this.connectToUser,
+                .setValue(new ConnectionRequest("REQUEST " + this.connectToUser,
                         FirebaseAuth.getInstance()
                                 .getCurrentUser()
                                 .getDisplayName())
                 );
-
-
     }
 
     // This shows the connectButton when marker is tapped
@@ -640,6 +687,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         this.connectToUser = "";
 
     }
+
 }
 
 

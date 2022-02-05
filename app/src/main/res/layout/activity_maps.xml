@@ -1,29 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:padding="20dp"
     tools:context=".MapsActivity">
 
-<fragment xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:map="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/map"
-    android:name="com.google.android.gms.maps.SupportMapFragment"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".MapsActivity" />
+    <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:map="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/map"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".MapsActivity" />
 
     <Button
         android:id="@+id/visibilityButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
+        android:text="Toggle Visibility"
         app:backgroundTint="@color/quantum_grey900"
-        app:cornerRadius="18px"
-        android:text="Toggle Visibility" />
+        app:cornerRadius="18px" />
+
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottom_navigation"
@@ -33,5 +34,67 @@
         app:itemBackground="@color/black"
         app:itemIconTint="@drawable/selector"
         app:itemTextColor="@drawable/selector"
-        app:menu="@menu/menu_navigation" />
+        app:menu="@menu/menu_navigation">
+
+    </com.google.android.material.bottomnavigation.BottomNavigationView>
+
+    <TextView
+        android:id="@+id/connectedText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="false"
+        android:layout_centerVertical="true"
+        android:text="Connected to USER"
+        android:textAlignment="center"
+        android:textSize="16sp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="244dp"
+        android:layout_below="@+id/visibilityButton"
+        android:layout_marginTop="373dp"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <Button
+                android:id="@+id/connectButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Connect"
+                app:backgroundTint="@color/quantum_grey900"
+                app:strokeWidth="1dp" />
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="189dp">
+
+            <ListView
+                android:id="@+id/pendingRequests"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <Button
+                    android:id="@+id/toggleRequestsButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Requests"
+                    app:backgroundTint="@color/quantum_grey900"
+                    app:cornerRadius="18px"
+                    app:strokeWidth="1dp" />
+            </ListView>
+        </RelativeLayout>
+
+    </LinearLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="603dp">
+
+    </RelativeLayout>
+
 </RelativeLayout>

@@ -198,8 +198,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //if they are not set, start activity to set credentials
         //TODO
 
-
-        binding = ActivityMapsBinding.inflate(getLayoutInflater());
+        try {
+            binding = ActivityMapsBinding.inflate(getLayoutInflater());
+        } catch (Exception e) {
+            Log.e("WTF", "onCreate", e);
+            throw e;
+        }
         setContentView(binding.getRoot());
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.

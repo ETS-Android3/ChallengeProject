@@ -6,26 +6,20 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.Button;
-import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.firebase.geofire.GeoFire;
@@ -50,19 +44,14 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 
 import fr.eurecom.bottomnavigationdemo.databinding.ActivityMapsBinding;
@@ -74,19 +63,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private Button visibilityButton;
     private boolean firstTime = true;
-
-    // Connect to user button
-    private Button connectButton;
-    private boolean showConnect = false;
-    private String connectToUser = "";
-
-
-    // Receive TODO
-    private TextView connectedText;
-    boolean listViewVisible = false;
-    private Button toggleRequestsButton;
-    private ListView listView;
-
 
     //GeoQuery geoQuery = geoFire.queryAtLocation(new GeoLocation(location.getLatitude(), location.getLongitude()), 1.0);
 
@@ -207,7 +183,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-
         // Construct a PlacesClient
         Places.initialize(getApplicationContext(), Integer.toString(R.string.google_maps_key));
 
@@ -250,125 +225,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 toggleVisibility();
             }
         });
-
-        // Create connectButton
-        connectButton = findViewById(R.id.connectButton);
-        connectButton.setVisibility(View.INVISIBLE);
-        connectButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                connectUser();
-            }
-        });
-
-        // Received text field
-        connectedText = findViewById(R.id.connectedText);
-        connectedText.setVisibility(View.INVISIBLE);
-        connectedText.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                closeConnectedText();
-            }
-        });
-
-        // Toggle listView requests button
-        toggleRequestsButton = findViewById(R.id.toggleRequestsButton);
-        toggleRequestsButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                toggleRequestsView();
-            }
-        });
-
-        // Create pendingRequests list view
-        final FirebaseDatabase database = FirebaseDatabase.getInstance();
-        final DatabaseReference myRef = database.getReference("ConnectionRequest");
-
-        final ArrayList<ConnectionRequest> requestsArray = new ArrayList<>();
-        final RequestAdapter adapter = new RequestAdapter(this, requestsArray);
-
-        listView = findViewById(R.id.pendingRequests);
-        listView.setAdapter(adapter);
-        listView.setBackgroundColor(Color.WHITE);
-        listView.setVisibility(View.INVISIBLE);
-
-        myRef.addValueEventListener(new ValueEventListener() {
-
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                Log.d("JAN", "DATA CHANGED");
-
-
-                requestsArray.clear();
-                adapter.clear();
-
-                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-
-                    ConnectionRequest read_request = dataSnapshot.getValue(ConnectionRequest.class);
-                    //read_request.setMessageUser(dataSnapshot.getKey());
-                    String[] message = read_request.getMessageText().split(" ");
-                    String type = message[0];
-                    Log.d("JAN", "type:!"+type+"!");
-
-                    String recipient = "";
-                    for (int i =1; i< message.length; i++) {
-                        recipient += " " + message[i];
-                    }
-                    recipient = recipient.trim();
-                    Log.d("JAN", "recipient:!"+recipient+"!");
-                    Log.d("JAN", "myusername:!"+user.getName()+"!");
-
-
-                    String fromUser = read_request.getMessageUser();
-                    if (recipient.equalsIgnoreCase(user.getName())) {
-                        Log.d("JAN", "GOT REQUEST1");
-
-                        if (type.equalsIgnoreCase("REQUEST")) {
-                            Log.d("JAN", "GOT REQUEST2");
-                            requestsArray.add(read_request);
-                            adapter.notifyDataSetChanged();
-                        } else {
-                            // CONFIRMATION
-                            // Send confirmation back
-                            Log.d("JAN", "GOT CONFIRMATION");
-
-                            connectedText.setVisibility(View.VISIBLE);
-                            connectedText.setText(fromUser + " has accepted you request!");
-                        }
-                    }
-
-                    long currentTime = new Date().getTime();
-                    long timeBeforeRequestDeletion = 1000*60*10; // 10 min
-                    if (currentTime - read_request.getMessageTime() > timeBeforeRequestDeletion) {
-                        dataSnapshot.getRef().removeValue();
-                    }
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                Log.w("REQUEST", "loadRequest:onCancelled", error.toException());
-
-            }
-        });
-
-        // Accept connection request when clicking on listview
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String user = requestsArray.get(position).getMessageUser();
-                Log.d("JAN", user);
-                FirebaseDatabase.getInstance()
-                        .getReference("ConnectionRequest")
-                        .push()
-                        .setValue(new ConnectionRequest("CONFIRMATION " + user,
-                                FirebaseAuth.getInstance()
-                                        .getCurrentUser()
-                                        .getDisplayName())
-                        );
-            }
-        });
-
         createGeoQuery();
 
         Log.i("onCreate", "at end");
@@ -459,6 +315,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
      * it inside the SupportMapFragment. This method will only be triggered once the user has
      * installed Google Play services and returned to the app.
      */
+
     @Override
     public void onMapReady(GoogleMap map) {
         this.map = map;
@@ -491,39 +348,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         // Get the current location of the device and set the position of the map.
         getDeviceLocation();
-
-        //createGeoQuery(geoFire, location);
-
-        // Add InfoWindowClick to map
-        map.setOnInfoWindowClickListener(
-                new GoogleMap.OnInfoWindowClickListener() {
-                    // This shows the connectButton when marker is tapped
-                    @Override
-                    public void onInfoWindowClick(@NonNull Marker marker) {
-                        Log.d("JAN", "CLICKED MARKER1");
-
-                        showConnect = true;
-                        connectButton.setVisibility(View.VISIBLE);
-                        connectButton.setText("Connect to " + marker.getTitle() + "!");
-                        connectToUser = marker.getTitle();
-                        Log.d("JAN", "CLICKED MARKER");
-                    }
-                }
-        );
-
-        map.setOnInfoWindowCloseListener(
-                new GoogleMap.OnInfoWindowCloseListener() {
-                    // This hides the connectButton when marker is closed
-                    @Override
-                    public void onInfoWindowClose(@NonNull Marker marker) {
-                        showConnect = false;
-                        connectButton.setVisibility(View.INVISIBLE);
-                        connectToUser = "";
-                        Log.d("JAN", "CLOSED MARKER");
-
-                    }
-                }
-        );
 
     }
 
@@ -610,14 +434,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         updateLocationUI();
     }
 
-    @SuppressLint("MissingPermission")
     private void updateLocationUI() {
         if (map == null) {
             return;
         }
         map.clear();
         FirebaseStorage storage = FirebaseStorage.getInstance();
-        StorageReference imageRef = storage.getReferenceFromUrl("gs://challengeproject-334921.appspot.com/Avatars/Avatar1.png");
+        //StorageReference imageRef = storage.getReferenceFromUrl("gs://challengeproject-334921.appspot.com/Avatars/Avatar1.png");
 
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Users");
 
@@ -627,13 +450,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             public void onComplete(@NonNull Task<DataSnapshot> task) {
                 if(task.isSuccessful()) {
 
-
                     try {
                         for (String keys : usersArray.keySet()) {
                             if (user.getUID() != keys) {
                                 //testing new marker:
                                 final long ONE_MEGABYTE = 1024 * 1024;
-                                DataSnapshot s = task.getResult();
+                                StorageReference imageRef = storage.getReferenceFromUrl( (String) task.getResult().child(keys).child("avatarURL").getValue());
                                 imageRef.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
                                     @Override
                                     public void onSuccess(byte[] bytes) {
@@ -723,38 +545,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         super.onStop();
         Log.i("STOP", "onStop called");
     }
-
-
-    // Connect to user method runs once button has been clicked.
-    private void connectUser() {
-
-        // Read the input field and push a new instance
-        // of ConnectionRequest to the Firebase database
-        FirebaseDatabase.getInstance()
-                .getReference("ConnectionRequest")
-                .push()
-                .setValue(new ConnectionRequest("REQUEST " + this.connectToUser,
-                        FirebaseAuth.getInstance()
-                                .getCurrentUser()
-                                .getDisplayName())
-                );
-    }
-
-    private void closeConnectedText() {
-        connectedText.setVisibility(View.INVISIBLE);
-    }
-
-    private void toggleRequestsView() {
-        if (listViewVisible) {
-            listView.setVisibility(View.INVISIBLE);
-            listViewVisible = false;
-        } else {
-            listView.setVisibility(View.VISIBLE);
-            listViewVisible = true;
-        }
-    }
-
-
 }
 
 

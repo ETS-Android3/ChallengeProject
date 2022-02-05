@@ -26,8 +26,6 @@ import java.util.Collections;
 
 public class ShopActivity extends AppCompatActivity {
 
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,13 +60,7 @@ public class ShopActivity extends AppCompatActivity {
 
             }
         });
-
-
-
-
         // Removes title bar
-        //this.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        //this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         getSupportActionBar().hide();
 
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);

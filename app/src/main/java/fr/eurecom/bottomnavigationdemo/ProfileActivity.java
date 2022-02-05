@@ -2,11 +2,13 @@ package fr.eurecom.bottomnavigationdemo;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.res.ResourcesCompat;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -55,7 +57,11 @@ public class ProfileActivity extends AppCompatActivity {
     private String displayStatus;
     private TextView displayStatusTextView;
 
+    private Drawable displayAvatar;
+    private ImageView displayAvatarImageView;
+
     private Button editProfileButton;
+    private Button editAvatarButton;
 
     private ImageView imageView;
     private Button setProfilePicBtn;
@@ -132,9 +138,12 @@ public class ProfileActivity extends AppCompatActivity {
         displayStatusTextView = findViewById(R.id.statusTextView);
         displayStatusTextView.setText(displayStatus);
 
+        // Sets the avatar to the display
+        displayAvatar = user.getAvatar();
+        displayAvatarImageView = findViewById(R.id.avatarView);
+        displayAvatarImageView.setImageDrawable(displayAvatar);
 
         imageView = findViewById(R.id.ProfilePicImageView);
-
 
         setProfilePicBtn = findViewById(R.id.idBtnAddProfilePic);
         setProfilePicBtn.setOnClickListener(new View.OnClickListener() {
@@ -146,6 +155,14 @@ public class ProfileActivity extends AppCompatActivity {
 
         setImage();
 
+        editAvatarButton = findViewById(R.id.editAvatarButton);
+        editAvatarButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(getApplicationContext(), EditAvatar.class));
+            }
+        });
+
         editProfileButton = findViewById(R.id.editProfileButton);
         editProfileButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -153,6 +170,7 @@ public class ProfileActivity extends AppCompatActivity {
                 editProfile();
             }
         });
+
 
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
         bottomNavigationView.setSelectedItemId(R.id.profile);

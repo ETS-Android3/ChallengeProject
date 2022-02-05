@@ -15,6 +15,7 @@ public class EditProfileActivity extends AppCompatActivity {
     private EditText etPhone, etGender, etAge, etStatus;
 
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

@@ -6,6 +6,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#F7131013"
     tools:context=".ShopActivity">
 
 
@@ -38,6 +39,7 @@
         android:layout_marginEnd="77dp"
         android:text="Shop"
         android:textAlignment="center"
+        android:textColor="#8E8787"
         android:textSize="50sp"
         android:textStyle="bold" />
 
@@ -52,17 +54,18 @@
         android:layout_marginTop="120dp"
         android:layout_marginEnd="51dp"
         android:text="COMING SOON: here you can buy new avatars, and personalize the look of your avatar!"
-        android:textSize="15sp"
-        android:textAlignment="center"/>
+        android:textAlignment="center"
+        android:textColor="#FFFFFF"
+        android:textSize="15sp" />
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/bottom_navigation"
-        app:itemBackground="@color/design_default_color_background"
         app:itemTextColor="@drawable/selector"
         app:itemIconTint="@drawable/selector"
         app:menu="@menu/menu_navigation"
+        app:itemBackground="@color/black"
         android:layout_alignParentBottom="true"/>
 
 </RelativeLayout>

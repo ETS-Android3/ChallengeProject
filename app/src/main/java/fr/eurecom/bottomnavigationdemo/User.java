@@ -3,12 +3,16 @@ package fr.eurecom.bottomnavigationdemo;
 import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.graphics.drawable.Drawable;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
 import android.util.Log;
+import android.widget.ImageSwitcher;
+import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.res.ResourcesCompat;
 
 import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
@@ -52,7 +56,7 @@ public final class User {
     private LocationManager locationManager;
 
     private String profilePictureURL;
-    private String avatarURL;
+    private Drawable avatar;
 
     DatabaseReference ref;
     DatabaseReference georef;
@@ -91,11 +95,12 @@ public final class User {
         setLocation(location);
     }
 
-    private User(String UID, String name, int age, String gender, String phone) {
+    private User(String UID, String name, int age, String gender, String phone, Drawable avatar) {
         setName(name);
         setAge(age);
         setGender(gender);
         setPhone(phone);
+        setAvatar(avatar);
         //setLocation);
         this.UID = auth.getUid();
     }
@@ -182,8 +187,18 @@ public final class User {
 
     public void setPhone(String phone) {
         this.phone = phone;
-        ref.child("phone").setValue(this.getPhone());
     }
+
+
+    public Drawable getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(Drawable drawableAvatar) {
+        this.avatar = drawableAvatar;
+    }
+
+
 
     public Location getLocation() {
         return this.location;
@@ -216,14 +231,6 @@ public final class User {
 
     public void setProfilePictureURL(String url){
         this.profilePictureURL = url;
-    }
-
-    public String getAvatarURL(){
-        return this.avatarURL;
-    }
-
-    public void setAvatarURL(String url){
-        this.avatarURL = url;
     }
 
     public Location fetchLocation() {

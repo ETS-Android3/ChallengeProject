@@ -621,7 +621,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
         map.clear();
         FirebaseStorage storage = FirebaseStorage.getInstance();
-        StorageReference imageRef = storage.getReferenceFromUrl("gs://challengeproject-334921.appspot.com/Avatars/Avatar1.png");
+        //StorageReference imageRef = storage.getReferenceFromUrl("gs://challengeproject-334921.appspot.com/Avatars/Avatar1.png");
 
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Users");
 
@@ -638,6 +638,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 //testing new marker:
                                 final long ONE_MEGABYTE = 1024 * 1024;
                                 DataSnapshot s = task.getResult();
+
+                                String avatarURL = (String) task.getResult().child(keys).child("avatarURL").getValue();
+
+                                StorageReference imageRef = storage.getReferenceFromUrl(avatarURL);
+
                                 imageRef.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
                                     @Override
                                     public void onSuccess(byte[] bytes) {

@@ -27,6 +27,7 @@ public class EditAvatar extends AppCompatActivity {
 
 
         user.setAvatar(avatar);
+        user.setAvatarURL("gs://challengeproject-334921.appspot.com/Avatars/normalboyavatar.PNG");
 
         Toast.makeText(this,"Avatar Updated Successfully",Toast.LENGTH_SHORT).show();
         // Here you can call you API
@@ -43,6 +44,10 @@ public class EditAvatar extends AppCompatActivity {
         Drawable avatar = ResourcesCompat.getDrawable(getApplicationContext().getResources(), R.drawable.blackoutfitgirl, null);
 
         user.setAvatar(avatar);
+        //user.setAvatarURL("gs://challengeproject-334921.appspot.com/Avatars/blackoutfitgirl.png");
+        user.setAvatarURL("gs://challengeproject-334921.appspot.com/Avatars/Avatar2.png");
+
+
 
         Toast.makeText(this,"Avatar Updated Successfully",Toast.LENGTH_SHORT).show();
         // Here you can call you API

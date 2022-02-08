@@ -254,4 +254,10 @@ public final class User {
         }
     }
 
+    public void setAvatarURL(String URL) {
+        ref = FirebaseDatabase.getInstance().getReference("Users").child(UID);
+        ref.child("avatarURL").setValue(URL);
+
+    }
+
 }

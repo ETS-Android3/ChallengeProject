@@ -14,7 +14,6 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.util.Arrays;
 import java.util.List;
@@ -110,7 +109,8 @@ public class LoginActivity extends AppCompatActivity {
                                     // login screen and set logo method is used for
                                     // adding logo for our login page.
                                     //.setLogo(R.drawable.gfgimage).setTheme(R.style.Theme)
-
+                                    .setLogo(R.drawable.logo)
+                                    .setTheme(R.style.LoginTheme)
                                     // after setting our theme and logo
                                     // we are calling a build() method
                                     // to build our login screen.

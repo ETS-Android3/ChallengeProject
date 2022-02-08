@@ -1,10 +1,18 @@
 package fr.eurecom.bottomnavigationdemo;
 
+import android.Manifest;
+import android.content.Context;
+import android.content.pm.PackageManager;
+import android.graphics.drawable.Drawable;
+import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
 import android.util.Log;
+import android.widget.ImageSwitcher;
+import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.res.ResourcesCompat;
 
 import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
@@ -47,6 +55,9 @@ public final class User {
     private Location location;
     private LocationManager locationManager;
 
+    private String profilePictureURL;
+    private Drawable avatar;
+
     DatabaseReference ref;
     DatabaseReference georef;
     GeoFire geoFire;
@@ -63,6 +74,9 @@ public final class User {
         this.visible = false;
 
         ref = FirebaseDatabase.getInstance().getReference("Users").child(UID);
+        ref.child("name").setValue(name);
+        ref.child("avatarURL").setValue("gs://challengeproject-334921.appspot.com/Avatars/Avatar1.png");
+
         georef = FirebaseDatabase.getInstance().getReference("Locations");
         geoFire = new GeoFire(georef);
 
@@ -81,11 +95,12 @@ public final class User {
         setLocation(location);
     }
 
-    private User(String UID, String name, int age, String gender, String phone) {
+    private User(String UID, String name, int age, String gender, String phone, Drawable avatar) {
         setName(name);
         setAge(age);
         setGender(gender);
         setPhone(phone);
+        setAvatar(avatar);
         //setLocation);
         this.UID = auth.getUid();
     }
@@ -172,8 +187,18 @@ public final class User {
 
     public void setPhone(String phone) {
         this.phone = phone;
-        ref.child("phone").setValue(this.getPhone());
     }
+
+
+    public Drawable getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(Drawable drawableAvatar) {
+        this.avatar = drawableAvatar;
+    }
+
+
 
     public Location getLocation() {
         return this.location;
@@ -200,6 +225,14 @@ public final class User {
         this.visible = bool;
     }
 
+    public String getProfilePictureURL(){
+        return this.profilePictureURL;
+    }
+
+    public void setProfilePictureURL(String url){
+        this.profilePictureURL = url;
+    }
+
     public Location fetchLocation() {
         Location location = new Location("");
         location.setLatitude(12.0);
@@ -211,7 +244,7 @@ public final class User {
 
     private void updateUserData(Task<DataSnapshot> task) {
         if (task.getResult().child("age").getValue() != null ||
-                task.getResult().child("phone").getValue() != null ||
+                task.getResult().child("gender").getValue() != null ||
                 task.getResult().child("phone").getValue() != null) {
             this.setAge(((Long) task.getResult().child("age").getValue()).intValue());
             this.setGender((String) task.getResult().child("gender").getValue());

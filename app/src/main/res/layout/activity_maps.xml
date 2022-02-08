@@ -5,31 +5,94 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#F7131013"
     tools:context=".MapsActivity">
 
-<fragment xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:map="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/map"
-    android:name="com.google.android.gms.maps.SupportMapFragment"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".MapsActivity" />
+    <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:map="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/map"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".MapsActivity" />
 
     <Button
         android:id="@+id/visibilityButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Toggle Visibility"
-        android:layout_centerHorizontal="true"/>
+        android:layout_centerHorizontal="true"
+        app:backgroundTint="@color/quantum_grey900"
+        app:cornerRadius="18px"
+        android:text="Toggle Visibility" />
 
-<com.google.android.material.bottomnavigation.BottomNavigationView
-android:layout_width="match_parent"
-android:layout_height="wrap_content"
-android:id="@+id/bottom_navigation"
-app:itemBackground="@color/design_default_color_background"
-app:itemTextColor="@drawable/selector"
-app:itemIconTint="@drawable/selector"
-app:menu="@menu/menu_navigation"
-android:layout_alignParentBottom="true"/>
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/bottom_navigation"
+        app:itemBackground="@color/black"
+        app:itemTextColor="@drawable/selector"
+        app:itemIconTint="@drawable/selector"
+        app:menu="@menu/menu_navigation"
+        android:layout_alignParentBottom="true">
+
+    </com.google.android.material.bottomnavigation.BottomNavigationView>
+
+    <TextView
+        android:id="@+id/connectedText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="false"
+        android:layout_centerVertical="true"
+        android:text="Connected to USER"
+        android:textAlignment="center"
+        android:textSize="16sp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="244dp"
+        android:layout_below="@+id/visibilityButton"
+        android:layout_marginTop="373dp"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <Button
+                android:id="@+id/connectButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Connect"
+                app:backgroundTint="@color/quantum_grey900" />
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="189dp">
+
+            <ListView
+                android:id="@+id/pendingRequests"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+        </RelativeLayout>
+
+    </LinearLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="603dp">
+
+        <Button
+            android:id="@+id/toggleRequestsButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
+            android:text="Requests"
+            app:backgroundTint="@color/quantum_grey900"
+            app:cornerRadius="18px" />
+    </RelativeLayout>
+
 </RelativeLayout>

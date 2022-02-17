@@ -1,6 +1,7 @@
-# MobServ Challenge Project -- GetOut Android application
+# GetOut 
+An Android application made for the MobServ challenge project.
 
-## Prequisites
+## Prerequisites
 Android Studio with device emulator that supports Google Maps API.
 
 ## Installation instructions
